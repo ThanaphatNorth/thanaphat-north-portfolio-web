@@ -52,21 +52,3 @@ CREATE POLICY "Allow authenticated users full access" ON contacts
 -- ============================================
 CREATE OR REPLACE VIEW unread_contacts AS
 SELECT * FROM contacts WHERE read = FALSE ORDER BY created_at DESC;
-
--- ============================================
--- ADMIN USER SETUP
--- ============================================
--- 
--- IMPORTANT: Create the admin user via Supabase Dashboard:
--- 
--- 1. Go to your Supabase project dashboard
--- 2. Navigate to Authentication > Users
--- 3. Click "Add User" > "Create New User"
--- 4. Enter the following credentials:
---    - Email: thanaphat.ch@work.com
---    - Password: Northregion1@99
--- 5. Check "Auto Confirm User" checkbox
--- 6. Click "Create User"
---
--- The admin can then log in at /admin/login
--- ============================================
