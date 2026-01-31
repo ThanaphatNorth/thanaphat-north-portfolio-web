@@ -88,9 +88,9 @@ export function Hero() {
           Engineering Manager{" "}
           <span className="text-muted">|</span>{" "}
           <br className="hidden md:block" />
-          <span className="gradient-text">Scaling High-Performing Teams</span>
-          <br />
-          <span className="text-muted">&</span> Robust Systems
+          <span className="gradient-text">Scaling Teams</span>
+          <span className="text-muted"> & </span>
+          <span className="gradient-text">Systems</span>
         </motion.h1>
 
         {/* Sub-headline */}

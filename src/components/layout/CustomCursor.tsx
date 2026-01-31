@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useSpring } from "framer-motion";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { useMousePosition } from "@/hooks/useMousePosition";
 
 export function CustomCursor() {
@@ -10,12 +10,16 @@ export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(true);
 
-  // Smooth spring animation for cursor position
-  const cursorX = useSpring(0, { stiffness: 500, damping: 28 });
-  const cursorY = useSpring(0, { stiffness: 500, damping: 28 });
+  // Use refs to avoid re-renders for hover state changes
+  const isHoveringRef = useRef(false);
 
-  const ringX = useSpring(0, { stiffness: 150, damping: 15 });
-  const ringY = useSpring(0, { stiffness: 150, damping: 15 });
+  // Fast spring for cursor dot - follows mouse almost instantly
+  const cursorX = useSpring(x, { stiffness: 1000, damping: 50, mass: 0.1 });
+  const cursorY = useSpring(y, { stiffness: 1000, damping: 50, mass: 0.1 });
+
+  // Slightly slower spring for ring - creates trailing effect
+  const ringX = useSpring(x, { stiffness: 400, damping: 35, mass: 0.2 });
+  const ringY = useSpring(y, { stiffness: 400, damping: 35, mass: 0.2 });
 
   useEffect(() => {
     // Check if it's a touch device
@@ -23,13 +27,6 @@ export function CustomCursor() {
       "ontouchstart" in window || navigator.maxTouchPoints > 0
     );
   }, []);
-
-  useEffect(() => {
-    cursorX.set(x);
-    cursorY.set(y);
-    ringX.set(x);
-    ringY.set(y);
-  }, [x, y, cursorX, cursorY, ringX, ringY]);
 
   useEffect(() => {
     const handleMouseEnter = () => setIsVisible(true);
@@ -44,27 +41,50 @@ export function CustomCursor() {
     };
   }, []);
 
+  // Memoized handlers to prevent recreating on each render
+  const handleHoverStart = useCallback(() => {
+    if (!isHoveringRef.current) {
+      isHoveringRef.current = true;
+      setIsHovering(true);
+    }
+  }, []);
+
+  const handleHoverEnd = useCallback(() => {
+    if (isHoveringRef.current) {
+      isHoveringRef.current = false;
+      setIsHovering(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const handleHoverStart = () => setIsHovering(true);
-    const handleHoverEnd = () => setIsHovering(false);
+    // Use event delegation for better performance
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as Element;
+      if (target.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
+        handleHoverStart();
+      }
+    };
 
-    // Find all interactive elements
-    const interactiveElements = document.querySelectorAll(
-      'a, button, [role="button"], input, textarea, select, [data-cursor-hover]'
-    );
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.target as Element;
+      const relatedTarget = e.relatedTarget as Element | null;
+      
+      if (target.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
+        // Check if we're not moving to another interactive element
+        if (!relatedTarget?.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
+          handleHoverEnd();
+        }
+      }
+    };
 
-    interactiveElements.forEach((el) => {
-      el.addEventListener("mouseenter", handleHoverStart);
-      el.addEventListener("mouseleave", handleHoverEnd);
-    });
+    document.addEventListener("mouseover", handleMouseOver, { passive: true });
+    document.addEventListener("mouseout", handleMouseOut, { passive: true });
 
     return () => {
-      interactiveElements.forEach((el) => {
-        el.removeEventListener("mouseenter", handleHoverStart);
-        el.removeEventListener("mouseleave", handleHoverEnd);
-      });
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
     };
-  }, []);
+  }, [handleHoverStart, handleHoverEnd]);
 
   // Don't render on touch devices
   if (isTouchDevice) return null;
@@ -80,9 +100,9 @@ export function CustomCursor() {
         }
       `}</style>
 
-      {/* Cursor Dot */}
+      {/* Cursor Dot - follows mouse instantly */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference will-change-transform"
         style={{
           x: cursorX,
           y: cursorY,
@@ -93,14 +113,14 @@ export function CustomCursor() {
           scale: isHovering ? 0.5 : 1,
           opacity: isVisible ? 1 : 0,
         }}
-        transition={{ duration: 0.15 }}
+        transition={{ duration: 0.1 }}
       >
         <div className="w-3 h-3 bg-white rounded-full" />
       </motion.div>
 
-      {/* Cursor Ring */}
+      {/* Cursor Ring - trails behind slightly */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998]"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] will-change-transform"
         style={{
           x: ringX,
           y: ringY,
@@ -111,10 +131,10 @@ export function CustomCursor() {
           scale: isHovering ? 1.5 : 1,
           opacity: isVisible ? 1 : 0,
         }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.15 }}
       >
         <div
-          className={`w-10 h-10 rounded-full border-2 transition-colors duration-200 ${
+          className={`w-10 h-10 rounded-full border-2 transition-colors duration-150 ${
             isHovering ? "border-accent" : "border-white/30"
           }`}
         />
