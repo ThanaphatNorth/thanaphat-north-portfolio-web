@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: "Portfolio Contact <onboarding@resend.dev>",
+        from: "Portfolio Contact <contact@thanaphatnorth.com>",
         to: adminEmail,
         subject: emailSubject,
         html: `
