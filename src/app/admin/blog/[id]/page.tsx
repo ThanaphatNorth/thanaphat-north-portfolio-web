@@ -9,7 +9,6 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Image as ImageIcon,
   Tag,
   Clock,
   Star,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { BlogPost } from "@/lib/supabase";
 
 function generateSlug(title: string): string {
@@ -34,6 +34,8 @@ export default function EditBlogPostPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  // For edit page, slug is already set so we mark it as manually edited by default
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -47,6 +49,21 @@ export default function EditBlogPostPage() {
   });
 
   const supabase = createSupabaseBrowserClient();
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const title = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      title,
+      // Only auto-generate slug if user hasn't manually edited it
+      slug: slugManuallyEdited ? prev.slug : generateSlug(title),
+    }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, slug: e.target.value }));
+  };
 
   useEffect(() => {
     async function fetchPost() {
@@ -238,9 +255,7 @@ export default function EditBlogPostPage() {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={handleTitleChange}
               placeholder="Enter post title..."
               className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors text-lg"
             />
@@ -254,9 +269,7 @@ export default function EditBlogPostPage() {
             <input
               type="text"
               value={formData.slug}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, slug: e.target.value }))
-              }
+              onChange={handleSlugChange}
               placeholder="post-url-slug"
               className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors font-mono text-sm"
             />
@@ -294,25 +307,21 @@ export default function EditBlogPostPage() {
             />
           </div>
 
+          {/* Cover Image */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Cover Image
+            </label>
+            <ImageUpload
+              value={formData.cover_image}
+              onChange={(url) =>
+                setFormData((prev) => ({ ...prev, cover_image: url }))
+              }
+            />
+          </div>
+
           {/* Metadata Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Cover Image */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                <ImageIcon size={16} className="inline mr-2" />
-                Cover Image URL
-              </label>
-              <input
-                type="url"
-                value={formData.cover_image}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, cover_image: e.target.value }))
-                }
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors"
-              />
-            </div>
-
             {/* Tags */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
@@ -373,24 +382,6 @@ export default function EditBlogPostPage() {
             </div>
           </div>
 
-          {/* Cover Image Preview */}
-          {formData.cover_image && (
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Cover Image Preview
-              </label>
-              <div className="relative aspect-video bg-card border border-border rounded-lg overflow-hidden">
-                <img
-                  src={formData.cover_image}
-                  alt="Cover preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            </div>
-          )}
         </motion.form>
       </div>
     </div>

@@ -8,6 +8,7 @@ import { FreelanceServices } from "@/components/sections/FreelanceServices";
 import { Ventures } from "@/components/sections/Ventures";
 import { Philosophy } from "@/components/sections/Philosophy";
 import { TechStack } from "@/components/sections/TechStack";
+import { LatestBlog } from "@/components/sections/LatestBlog";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <ExperienceTimeline />
         <FreelanceServices />
         <Ventures />
+        <LatestBlog />
         <Philosophy />
         <TechStack />
       </main>

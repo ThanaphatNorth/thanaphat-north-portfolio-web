@@ -129,3 +129,39 @@ CREATE TRIGGER update_blog_posts_updated_at
 -- ============================================
 CREATE OR REPLACE VIEW published_posts AS
 SELECT * FROM blog_posts WHERE published = TRUE ORDER BY published_at DESC;
+
+-- ============================================
+-- Storage Setup for Blog Images
+-- ============================================
+
+-- 15. CREATE STORAGE BUCKET FOR BLOG IMAGES
+-- Run this in Supabase Dashboard > Storage > Create new bucket
+-- Bucket name: blog-images
+-- Public bucket: Yes (so images can be viewed by anyone)
+
+-- 16. STORAGE POLICIES (run in SQL Editor)
+-- ============================================
+
+-- Allow authenticated users to upload images
+CREATE POLICY "Allow authenticated uploads" ON storage.objects
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'blog-images');
+
+-- Allow authenticated users to update their uploads
+CREATE POLICY "Allow authenticated updates" ON storage.objects
+  FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'blog-images');
+
+-- Allow authenticated users to delete images
+CREATE POLICY "Allow authenticated deletes" ON storage.objects
+  FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'blog-images');
+
+-- Allow public read access to blog images
+CREATE POLICY "Allow public read access" ON storage.objects
+  FOR SELECT
+  TO public
+  USING (bucket_id = 'blog-images');

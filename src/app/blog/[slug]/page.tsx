@@ -148,7 +148,7 @@ export default async function BlogPostPage({
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link
             href="/blog"
             className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
@@ -160,73 +160,75 @@ export default async function BlogPostPage({
         </div>
       </nav>
 
-      <article className="max-w-3xl mx-auto px-4 py-12">
-        {/* Header */}
-        <header className="mb-12">
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap mb-4">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-sm bg-accent/10 text-accent rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+      <article className="max-w-5xl mx-auto px-4 py-12">
+        <div className="bg-card border border-border rounded-2xl p-6 md:p-10">
+          {/* Header */}
+          <header className="mb-10">
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 text-sm bg-accent/10 text-accent rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
+              {post.title}
+            </h1>
+
+            {post.excerpt && (
+              <p className="text-xl text-muted mb-6 leading-relaxed">
+                {post.excerpt}
+              </p>
+            )}
+
+            <div className="flex items-center gap-4 text-sm text-muted pb-6 border-b border-border">
+              <span className="flex items-center gap-1.5">
+                <Calendar size={16} />
+                {formatDate(post.published_at)}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Clock size={16} />
+                {post.read_time} min read
+              </span>
             </div>
-          )}
-          
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-            {post.title}
-          </h1>
-
-          {post.excerpt && (
-            <p className="text-xl text-muted mb-6 leading-relaxed">
-              {post.excerpt}
-            </p>
-          )}
-
-          <div className="flex items-center gap-4 text-sm text-muted">
-            <span className="flex items-center gap-1.5">
-              <Calendar size={16} />
-              {formatDate(post.published_at)}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Clock size={16} />
-              {post.read_time} min read
-            </span>
-          </div>
-        </header>
+          </header>
 
         {/* Cover Image */}
-        {post.cover_image && (
-          <div className="relative aspect-video rounded-2xl overflow-hidden mb-12 border border-border">
-            <img
-              src={post.cover_image}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+          {post.cover_image && (
+            <div className="relative rounded-xl overflow-hidden mb-10 bg-background p-4 flex items-center justify-center">
+              <img
+                src={post.cover_image}
+                alt={post.title}
+                className="w-full h-auto max-h-[500px] object-contain rounded-lg"
+              />
+            </div>
+          )}
 
         {/* Content */}
-        <div
-          className="prose prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: renderedContent }}
-        />
+          <div
+            className="prose prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: renderedContent }}
+          />
 
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-border">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/blog"
-              className="flex items-center gap-2 text-accent hover:text-accent-hover transition-colors"
-            >
-              <ArrowLeft size={18} />
-              Back to all posts
-            </Link>
-          </div>
-        </footer>
+          {/* Footer */}
+          <footer className="mt-12 pt-8 border-t border-border">
+            <div className="flex items-center justify-between">
+              <Link
+                href="/blog"
+                className="flex items-center gap-2 text-accent hover:text-accent-hover transition-colors"
+              >
+                <ArrowLeft size={18} />
+                Back to all posts
+              </Link>
+            </div>
+          </footer>
+        </div>
       </article>
     </div>
   );
