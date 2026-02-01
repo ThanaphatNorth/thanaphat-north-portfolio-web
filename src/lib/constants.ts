@@ -4,7 +4,7 @@ export const siteConfig = {
   description:
     "Engineering Manager with 8+ years of software development experience and 5+ years in leadership roles. Specialized in scaling high-performing teams and building robust systems.",
   url: "https://thanaphat-north.com",
-  ogImage: "/og-image.png",
+  ogImage: "/opengraph-image",
   resumeUrl: "/Thanaphat-Chirutpadathorn-Resume.pdf",
   links: {
     linkedin: "https://linkedin.com/in/thanaphat-chirutpadathorn",
