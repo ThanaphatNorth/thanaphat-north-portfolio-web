@@ -165,3 +165,69 @@ CREATE POLICY "Allow public read access" ON storage.objects
   FOR SELECT
   TO public
   USING (bucket_id = 'blog-images');
+
+-- ============================================
+-- Ventures Table - Supabase Setup
+-- ============================================
+
+-- 17. CREATE VENTURES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS ventures (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  tagline TEXT NOT NULL,
+  description TEXT NOT NULL,
+  url TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'Coming Soon',
+  icon TEXT DEFAULT 'Rocket',
+  display_order INTEGER DEFAULT 0,
+  visible BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 18. CREATE INDEXES FOR VENTURES
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_ventures_display_order ON ventures(display_order);
+CREATE INDEX IF NOT EXISTS idx_ventures_visible ON ventures(visible);
+CREATE INDEX IF NOT EXISTS idx_ventures_status ON ventures(status);
+
+-- 19. ENABLE RLS FOR VENTURES
+-- ============================================
+ALTER TABLE ventures ENABLE ROW LEVEL SECURITY;
+
+-- 20. DROP EXISTING VENTURES POLICIES (if re-running)
+-- ============================================
+DROP POLICY IF EXISTS "Allow public to read visible ventures" ON ventures;
+DROP POLICY IF EXISTS "Allow authenticated users full access to ventures" ON ventures;
+
+-- 21. CREATE RLS POLICIES FOR VENTURES
+-- ============================================
+
+-- Policy: Allow anyone to read visible ventures
+CREATE POLICY "Allow public to read visible ventures" ON ventures
+  FOR SELECT
+  TO anon, authenticated
+  USING (visible = TRUE);
+
+-- Policy: Allow authenticated users FULL access (for admin)
+CREATE POLICY "Allow authenticated users full access to ventures" ON ventures
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- 22. CREATE TRIGGER FOR ventures updated_at
+-- ============================================
+DROP TRIGGER IF EXISTS update_ventures_updated_at ON ventures;
+CREATE TRIGGER update_ventures_updated_at
+  BEFORE UPDATE ON ventures
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 23. INSERT DEFAULT VENTURES DATA (optional - run once)
+-- ============================================
+-- INSERT INTO ventures (name, tagline, description, url, status, icon, display_order, visible) VALUES
+-- ('JongQue.com', 'SaaS for Resource & Queue Management', 'A comprehensive platform for managing bookings, queues, and resources for businesses of all sizes.', 'https://jongque.com', 'Live', 'Rocket', 1, TRUE),
+-- ('BuildYourThinks.com', 'Startup Ideas & Founder Matchmaking', 'A platform connecting aspiring founders with ideas and co-founders to build the next big thing.', 'https://buildyourthinks.com', 'Beta', 'Sparkles', 2, TRUE),
+-- ('Visibr.com', 'Tech Blog & Knowledge Hub', 'Sharing insights on software architecture, engineering leadership, and technology trends.', 'https://visibr.com', 'Live', 'BookOpen', 3, TRUE);

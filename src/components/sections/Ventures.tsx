@@ -1,14 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
-import { ExternalLink, Rocket, Sparkles, BookOpen } from "lucide-react";
+import { ExternalLink, Rocket, Sparkles, BookOpen, Zap, Globe, Star, Loader2, LucideIcon } from "lucide-react";
 import { SectionWrapper, SectionHeader } from "@/components/ui/SectionWrapper";
-import { ventures } from "@/lib/constants";
+import { ventures as defaultVentures } from "@/lib/constants";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import type { Venture } from "@/lib/supabase";
 
-const iconMap = {
-  "JongQue.com": Rocket,
-  "BuildYourThinks.com": Sparkles,
-  "Visibr.com": BookOpen,
+const iconMap: Record<string, LucideIcon> = {
+  Rocket: Rocket,
+  Sparkles: Sparkles,
+  BookOpen: BookOpen,
+  Zap: Zap,
+  Globe: Globe,
+  Star: Star,
 };
 
 const statusColors = {
@@ -39,7 +45,70 @@ const cardVariants: Variants = {
   },
 };
 
+interface VentureItem {
+  id?: string;
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  status: string;
+  icon?: string;
+}
+
 export function Ventures() {
+  const [ventures, setVentures] = useState<VentureItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchVentures() {
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data, error } = await supabase
+          .from("ventures")
+          .select("*")
+          .eq("visible", true)
+          .order("display_order", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching ventures:", error);
+          // Fallback to default ventures from constants
+          setVentures(defaultVentures.map(v => ({ ...v, icon: "Rocket" })));
+        } else if (data && data.length > 0) {
+          setVentures(data);
+        } else {
+          // If no data in database, use default ventures
+          setVentures(defaultVentures.map(v => ({ ...v, icon: "Rocket" })));
+        }
+      } catch (error) {
+        console.error("Error fetching ventures:", error);
+        // Fallback to default ventures from constants
+        setVentures(defaultVentures.map(v => ({ ...v, icon: "Rocket" })));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchVentures();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <SectionWrapper id="ventures">
+        <SectionHeader
+          title="My Ventures"
+          subtitle="Building the ecosystem of tools and platforms for modern businesses and entrepreneurs"
+        />
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        </div>
+      </SectionWrapper>
+    );
+  }
+
+  if (ventures.length === 0) {
+    return null;
+  }
+
   return (
     <SectionWrapper id="ventures">
       <SectionHeader
@@ -54,14 +123,14 @@ export function Ventures() {
         viewport={{ once: true, margin: "-100px" }}
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        {ventures.map((venture, index) => {
-          const Icon = iconMap[venture.name as keyof typeof iconMap];
+        {ventures.map((venture) => {
+          const Icon = iconMap[venture.icon || "Rocket"] || Rocket;
           const statusColor =
             statusColors[venture.status as keyof typeof statusColors];
 
           return (
             <motion.a
-              key={venture.name}
+              key={venture.id || venture.name}
               href={venture.url}
               target="_blank"
               rel="noopener noreferrer"

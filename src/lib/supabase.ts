@@ -41,6 +41,31 @@ export interface BlogPostFormData {
   read_time?: number;
 }
 
+export interface Venture {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  status: 'Live' | 'Beta' | 'Coming Soon';
+  icon: string;
+  display_order: number;
+  visible: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VentureFormData {
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  status?: string;
+  icon?: string;
+  display_order?: number;
+  visible?: boolean;
+}
+
 export async function submitContactForm(data: ContactFormData) {
   const { error } = await supabase.from("contacts").insert([
     {

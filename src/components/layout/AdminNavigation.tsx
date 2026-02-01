@@ -11,6 +11,7 @@ import {
   FileText,
   Home,
   Settings,
+  Rocket,
 } from "lucide-react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 const adminNavLinks = [
   { href: "/admin", label: "Contacts", icon: Inbox },
   { href: "/admin/blog", label: "Blog", icon: FileText },
+  { href: "/admin/ventures", label: "Ventures", icon: Rocket },
 ];
 
 export function AdminNavigation() {
