@@ -1,17 +1,9 @@
-import { redirect } from "next/navigation";
-import { getUser } from "@/lib/supabase-server";
-
-export default async function LoginLayout({
+// Simple layout for login page - no auth checks here to prevent redirect loops
+// Auth is handled by middleware.ts
+export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
-
-  // If already authenticated, redirect to admin dashboard
-  if (user) {
-    redirect("/admin");
-  }
-
   return <>{children}</>;
 }

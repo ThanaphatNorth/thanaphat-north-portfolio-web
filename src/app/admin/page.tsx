@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LogOut,
   Mail,
   MailOpen,
   Trash2,
@@ -32,7 +30,6 @@ interface Contact {
 type FilterType = "all" | "unread" | "read";
 
 export default function AdminDashboard() {
-  const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
@@ -67,12 +64,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
-  };
 
   const handleToggleRead = async (contact: Contact) => {
     const newReadStatus = !contact.read;
@@ -119,40 +110,25 @@ export default function AdminDashboard() {
   const unreadCount = contacts.filter((c) => !c.read).length;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-foreground">
-              Contact Dashboard
-            </h1>
-            {unreadCount > 0 && (
-              <span className="px-2 py-1 bg-accent text-white text-xs font-medium rounded-full">
-                {unreadCount} unread
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={fetchContacts}
-              className="p-2 text-muted hover:text-foreground transition-colors rounded-lg hover:bg-background"
-              title="Refresh"
-            >
-              <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-muted hover:text-foreground transition-colors rounded-lg hover:bg-background"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold text-foreground">Contacts</h1>
+          {unreadCount > 0 && (
+            <span className="px-2 py-1 bg-accent text-white text-xs font-medium rounded-full">
+              {unreadCount} unread
+            </span>
+          )}
         </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
+        <button
+          onClick={fetchContacts}
+          className="p-2 text-muted hover:text-foreground transition-colors rounded-lg hover:bg-card border border-border"
+          title="Refresh"
+        >
+          <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
+        </button>
+      </div>
         {/* Filter Tabs */}
         <div className="flex items-center gap-2 mb-6">
           <Filter size={18} className="text-muted" />
@@ -348,6 +324,5 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -19,6 +19,7 @@ export const navLinks = [
   { href: "#services", label: "Services" },
   { href: "#ventures", label: "Ventures" },
   { href: "#tech-stack", label: "Tech Stack" },
+  { href: "/blog", label: "Blog", isExternal: true },
 ];
 
 export const impactStats = [

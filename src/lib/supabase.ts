@@ -13,6 +13,34 @@ export interface ContactFormData {
   message: string;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  cover_image: string | null;
+  published: boolean;
+  featured: boolean;
+  tags: string[];
+  read_time: number;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+}
+
+export interface BlogPostFormData {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  cover_image?: string;
+  published?: boolean;
+  featured?: boolean;
+  tags?: string[];
+  read_time?: number;
+}
+
 export async function submitContactForm(data: ContactFormData) {
   const { error } = await supabase.from("contacts").insert([
     {

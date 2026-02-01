@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { navLinks, siteConfig } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
@@ -64,20 +65,30 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <motion.a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(link.href);
-                }}
-                className="text-muted hover:text-foreground transition-colors duration-300 text-sm font-medium"
-                whileHover={{ y: -2 }}
-              >
-                {link.label}
-              </motion.a>
-            ))}
+            {navLinks.map((link) => 
+              link.isExternal ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-muted hover:text-foreground transition-colors duration-300 text-sm font-medium"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <motion.a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
+                  className="text-muted hover:text-foreground transition-colors duration-300 text-sm font-medium"
+                  whileHover={{ y: -2 }}
+                >
+                  {link.label}
+                </motion.a>
+              )
+            )}
           </div>
 
           {/* Desktop CTA */}
@@ -140,22 +151,39 @@ export function Navigation() {
 
                 {/* Mobile Nav Links */}
                 <div className="flex flex-col gap-4">
-                  {navLinks.map((link, index) => (
-                    <motion.a
-                      key={link.href}
-                      href={link.href}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(link.href);
-                      }}
-                      className="text-lg text-muted hover:text-foreground transition-colors duration-300 py-2"
-                    >
-                      {link.label}
-                    </motion.a>
-                  ))}
+                  {navLinks.map((link, index) => 
+                    link.isExternal ? (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-lg text-muted hover:text-foreground transition-colors duration-300 py-2 block"
+                        >
+                          {link.label}
+                        </Link>
+                      </motion.div>
+                    ) : (
+                      <motion.a
+                        key={link.href}
+                        href={link.href}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavClick(link.href);
+                        }}
+                        className="text-lg text-muted hover:text-foreground transition-colors duration-300 py-2"
+                      >
+                        {link.label}
+                      </motion.a>
+                    )
+                  )}
                 </div>
 
                 {/* Mobile CTA */}
