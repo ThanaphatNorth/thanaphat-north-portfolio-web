@@ -3,7 +3,7 @@ export const siteConfig = {
   title: "Thanaphat North | Engineering Manager & Tech Entrepreneur",
   description:
     "Engineering Manager with 8+ years of software development experience and 5+ years in leadership roles. Specialized in scaling high-performing teams and building robust systems.",
-  url: "https://thanaphat.dev",
+  url: "https://thanaphat-north.com",
   ogImage: "/og-image.png",
   resumeUrl: "/Thanaphat-Chirutpadathorn-Resume.pdf",
   links: {
