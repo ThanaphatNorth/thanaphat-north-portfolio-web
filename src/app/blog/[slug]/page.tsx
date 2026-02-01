@@ -156,7 +156,7 @@ export default async function BlogPostPage({
             <ArrowLeft size={18} />
             Back to Blog
           </Link>
-          <ShareButton title={post.title} />
+          <ShareButton title={post.title} description={post.excerpt || undefined} />
         </div>
       </nav>
 
