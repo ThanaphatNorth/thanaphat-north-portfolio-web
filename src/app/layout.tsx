@@ -80,6 +80,8 @@ export const metadata: Metadata = {
     },
   },
   verification: {
+    // TODO: Replace with your actual Google Search Console verification code
+    // Get it from: https://search.google.com/search-console → Settings → Ownership verification
     google: "your-google-verification-code",
   },
 };

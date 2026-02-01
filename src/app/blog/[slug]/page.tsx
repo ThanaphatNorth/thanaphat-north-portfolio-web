@@ -5,6 +5,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import { ShareButton } from "@/components/ui/ShareButton";
+import { siteConfig } from "@/lib/constants";
 
 interface BlogPost {
   id: string;
@@ -73,15 +74,36 @@ export async function generateMetadata({
     };
   }
 
+  const postUrl = `${siteConfig.url}/blog/${post.slug}`;
+
   return {
-    title: `${post.title} | Thanaphat Chirutpadathorn`,
+    title: post.title,
     description: post.excerpt || `Read ${post.title} on my blog.`,
+    keywords: post.tags?.length ? post.tags : undefined,
+    authors: [{ name: siteConfig.name }],
+    alternates: {
+      canonical: postUrl,
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt || undefined,
-      images: post.cover_image ? [post.cover_image] : undefined,
+      url: postUrl,
+      siteName: siteConfig.name,
+      images: post.cover_image
+        ? [{ url: post.cover_image, width: 1200, height: 630, alt: post.title }]
+        : [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: post.title }],
       type: "article",
       publishedTime: post.published_at || undefined,
+      modifiedTime: post.created_at,
+      authors: [siteConfig.name],
+      tags: post.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: post.cover_image ? [post.cover_image] : [siteConfig.ogImage],
+      creator: "@thanaphatnorth",
     },
   };
 }
@@ -143,9 +165,40 @@ export default async function BlogPostPage({
   }
 
   const renderedContent = renderContent(post.content);
+  const postUrl = `${siteConfig.url}/blog/${post.slug}`;
+
+  // JSON-LD Article structured data
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt || undefined,
+    image: post.cover_image || `${siteConfig.url}${siteConfig.ogImage}`,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.created_at,
+    author: {
+      "@type": "Person",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    publisher: {
+      "@type": "Person",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
+    keywords: post.tags?.join(", "),
+  };
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       {/* Navigation */}
       <nav className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">

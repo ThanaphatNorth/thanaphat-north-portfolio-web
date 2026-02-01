@@ -3,10 +3,36 @@ import Link from "next/link";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { BlogSearch } from "@/components/ui/BlogSearch";
+import { siteConfig } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Blog | Thanaphat Chirutpadathorn",
-  description: "Thoughts on software development, technology, and building products.",
+  title: "Blog",
+  description: "Thoughts on software development, technology, startups, and building products.",
+  alternates: {
+    canonical: `${siteConfig.url}/blog`,
+  },
+  openGraph: {
+    title: "Blog | Thanaphat Chirutpadathorn",
+    description: "Thoughts on software development, technology, startups, and building products.",
+    url: `${siteConfig.url}/blog`,
+    siteName: siteConfig.name,
+    type: "website",
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: "Thanaphat North's Blog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog | Thanaphat Chirutpadathorn",
+    description: "Thoughts on software development, technology, startups, and building products.",
+    images: [siteConfig.ogImage],
+    creator: "@thanaphatnorth",
+  },
 };
 
 interface BlogPost {
