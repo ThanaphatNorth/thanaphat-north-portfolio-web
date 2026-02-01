@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Thanaphat North - Engineering Manager & Tech Entrepreneur";
+export const alt = "Thanaphat Chirutpadathorn (North) - Engineering Manager & Tech Entrepreneur";
 export const size = {
   width: 1200,
   height: 630,
@@ -76,16 +76,29 @@ export default async function OGImage() {
           {/* Name */}
           <h1
             style={{
-              fontSize: "64px",
+              fontSize: "56px",
               fontWeight: "bold",
               color: "#fafafa",
-              margin: "0 0 16px 0",
+              margin: "0 0 8px 0",
               fontFamily: "system-ui, sans-serif",
               textAlign: "center",
             }}
           >
-            Thanaphat (North)
+            Thanaphat Chirutpadathorn
           </h1>
+
+          {/* Nickname */}
+          <p
+            style={{
+              fontSize: "28px",
+              color: "#71717a",
+              margin: "0 0 20px 0",
+              fontFamily: "system-ui, sans-serif",
+              textAlign: "center",
+            }}
+          >
+            (North)
+          </p>
 
           {/* Title */}
           <p

@@ -85,7 +85,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Thanaphat (North)",
+  name: "Thanaphat Chirutpadathorn (North)",
   url: siteConfig.url,
   image: `${siteConfig.url}/profile.jpg`,
   jobTitle: "Engineering Manager",
