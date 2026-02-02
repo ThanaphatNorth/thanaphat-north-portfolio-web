@@ -1,0 +1,30 @@
+{
+  "name": "Thanaphat Chirutpadathorn (North) - Engineering Manager",
+  "short_name": "Thanaphat North",
+  "description": "Engineering Manager & Tech Entrepreneur. Specialized in scaling high-performing teams and building robust systems.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "portfolio"],
+  "lang": "en",
+  "dir": "ltr"
+}

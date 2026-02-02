@@ -1,5 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
+import {
+  ExperienceYears,
+  calculateExperienceYears,
+  getDefaultExperienceYears,
+} from "./experience";
+import { ventures as defaultVentures } from "./constants";
 
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -42,3 +49,83 @@ export async function getUser() {
   } = await supabase.auth.getUser();
   return user;
 }
+
+/**
+ * Get experience years from database (server-side)
+ * Uses React.cache() for per-request deduplication
+ */
+export const getExperienceYears = cache(async (): Promise<ExperienceYears> => {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("key, value")
+      .in("key", ["career_start_date", "leadership_start_date"]);
+
+    if (error) {
+      console.warn("Error fetching experience settings:", error);
+      return getDefaultExperienceYears();
+    }
+
+    const settings = data as { key: string; value: string }[];
+    const careerSetting = settings.find((s) => s.key === "career_start_date");
+    const leadershipSetting = settings.find(
+      (s) => s.key === "leadership_start_date"
+    );
+
+    if (careerSetting && leadershipSetting) {
+      return calculateExperienceYears(
+        careerSetting.value,
+        leadershipSetting.value
+      );
+    }
+
+    return getDefaultExperienceYears();
+  } catch (err) {
+    console.warn("Error fetching experience settings:", err);
+    return getDefaultExperienceYears();
+  }
+});
+
+/**
+ * Venture item interface
+ */
+export interface VentureItem {
+  id?: string;
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  status: string;
+  icon?: string;
+}
+
+/**
+ * Get ventures from database (server-side)
+ * Uses React.cache() for per-request deduplication
+ */
+export const getVentures = cache(async (): Promise<VentureItem[]> => {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("ventures")
+      .select("*")
+      .eq("visible", true)
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching ventures:", error);
+      return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
+    }
+
+    if (data && data.length > 0) {
+      return data;
+    }
+
+    // If no data in database, use default ventures
+    return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
+  } catch (error) {
+    console.error("Error fetching ventures:", error);
+    return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
+  }
+});

@@ -231,3 +231,62 @@ CREATE TRIGGER update_ventures_updated_at
 -- ('JongQue.com', 'SaaS for Resource & Queue Management', 'A comprehensive platform for managing bookings, queues, and resources for businesses of all sizes.', 'https://jongque.com', 'Live', 'Rocket', 1, TRUE),
 -- ('BuildYourThinks.com', 'Startup Ideas & Founder Matchmaking', 'A platform connecting aspiring founders with ideas and co-founders to build the next big thing.', 'https://buildyourthinks.com', 'Beta', 'Sparkles', 2, TRUE),
 -- ('Visibr.com', 'Tech Blog & Knowledge Hub', 'Sharing insights on software architecture, engineering leadership, and technology trends.', 'https://visibr.com', 'Live', 'BookOpen', 3, TRUE);
+
+-- ============================================
+-- Site Settings Table - For configurable values
+-- ============================================
+
+-- 24. CREATE SITE SETTINGS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key TEXT NOT NULL UNIQUE,
+  value TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 25. CREATE INDEX FOR SITE SETTINGS
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
+
+-- 26. ENABLE RLS FOR SITE SETTINGS
+-- ============================================
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+-- 27. DROP EXISTING SITE SETTINGS POLICIES (if re-running)
+-- ============================================
+DROP POLICY IF EXISTS "Allow public to read site settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow authenticated users full access to site settings" ON site_settings;
+
+-- 28. CREATE RLS POLICIES FOR SITE SETTINGS
+-- ============================================
+
+-- Policy: Allow anyone to read site settings (needed for public pages)
+CREATE POLICY "Allow public to read site settings" ON site_settings
+  FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+-- Policy: Allow authenticated users FULL access (for admin)
+CREATE POLICY "Allow authenticated users full access to site settings" ON site_settings
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- 29. CREATE TRIGGER FOR site_settings updated_at
+-- ============================================
+DROP TRIGGER IF EXISTS update_site_settings_updated_at ON site_settings;
+CREATE TRIGGER update_site_settings_updated_at
+  BEFORE UPDATE ON site_settings
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 30. INSERT DEFAULT SITE SETTINGS
+-- ============================================
+INSERT INTO site_settings (key, value, description) VALUES
+  ('career_start_date', '2017-06-01', 'Start date for calculating total years in software development'),
+  ('leadership_start_date', '2021-01-01', 'Start date for calculating years in leadership roles')
+ON CONFLICT (key) DO NOTHING;

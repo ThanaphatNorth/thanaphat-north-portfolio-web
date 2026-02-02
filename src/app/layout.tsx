@@ -29,6 +29,14 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: siteConfig.url,
+    languages: {
+      "en-US": siteConfig.url,
+      "th-TH": siteConfig.url,
+    },
+  },
   keywords: [
     // Thai name variations
     "ฐานพัฒน์ จิรุตม์ผะดาทร",
@@ -73,12 +81,6 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
-  alternates: {
-    languages: {
-      "en-US": siteConfig.url,
-      "th-TH": siteConfig.url,
-    },
-  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -123,7 +125,7 @@ const personJsonLd = {
   name: "Thanaphat Chirutpadathorn (North)",
   alternateName: ["ฐานพัฒน์ จิรุตม์ผะดาทร", "Thanaphat North", "North"],
   url: siteConfig.url,
-  image: `${siteConfig.url}/profile.jpg`,
+  image: `${siteConfig.url}${siteConfig.ogImage}`,
   jobTitle: ["Engineering Manager", "Software Developer", "Freelance Developer"],
   worksFor: {
     "@type": "Organization",
@@ -196,7 +198,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="canonical" href={siteConfig.url} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}

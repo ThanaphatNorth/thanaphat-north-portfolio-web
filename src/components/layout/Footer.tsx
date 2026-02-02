@@ -130,13 +130,13 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-6 text-sm text-muted">
             <a
-              href="#"
+              href="/privacy"
               className="hover:text-foreground transition-colors"
             >
               Privacy Policy
             </a>
             <a
-              href="#"
+              href="/terms"
               className="hover:text-foreground transition-colors"
             >
               Terms of Service

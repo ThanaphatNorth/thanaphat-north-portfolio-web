@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
+import { getDefaultExperienceYears } from "@/lib/experience";
 
 export const runtime = "edge";
 
-export const alt = "ฐานพัฒน์ จิรุตม์ผะดาทร (Thanaphat North) - Engineering Manager & Software Developer | Freelance พัฒนาระบบ";
+export const alt = "Thanaphat Chirutpadathorn (North) - Engineering Manager & Tech Entrepreneur";
 export const size = {
   width: 1200,
   height: 630,
@@ -10,6 +11,7 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function OGImage() {
+  const experience = getDefaultExperienceYears();
   return new ImageResponse(
     (
       <div
@@ -110,7 +112,7 @@ export default async function OGImage() {
               textAlign: "center",
             }}
           >
-            Engineering Manager & Software Developer
+            Engineering Manager & Tech Entrepreneur
           </p>
 
           {/* Description */}
@@ -125,7 +127,7 @@ export default async function OGImage() {
               lineHeight: 1.5,
             }}
           >
-            8+ years in Software Development • Agile Expert • Freelance Available
+            {experience.totalYearsDisplay} years in Software Development • Agile Expert • Freelance Available
           </p>
         </div>
 

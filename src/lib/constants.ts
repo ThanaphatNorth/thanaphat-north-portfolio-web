@@ -1,10 +1,14 @@
+import { getDefaultExperienceYears } from "./experience";
+
+// Get default experience years for static content
+const defaultExperience = getDefaultExperienceYears();
+
 export const siteConfig = {
   name: "Thanaphat (North)",
   title:
     "Thanaphat Chirutpadathorn (North) | Engineering Manager & Tech Entrepreneur",
   nameThai: "ฐานพัฒน์ จิรุตม์ผะดาทร",
-  description:
-    "Engineering Manager with 8+ years of software development experience and 5+ years in leadership roles. Specialized in scaling high-performing teams and building robust systems.",
+  description: `Engineering Manager with ${defaultExperience.totalYearsDisplay} years of software development experience and ${defaultExperience.leadershipYearsDisplay} years in leadership roles. Specialized in scaling high-performing teams and building robust systems.`,
   url: "https://thanaphat-north.com",
   ogImage: "/opengraph-image",
   resumeUrl: "/Thanaphat-Chirutpadathorn-Resume.pdf",

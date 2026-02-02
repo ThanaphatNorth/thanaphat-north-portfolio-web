@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizeCss: true,
+    // Optimize barrel file imports for better bundle size and faster builds
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+    ],
   },
 };
 

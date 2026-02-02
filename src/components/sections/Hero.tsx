@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/constants";
+import { ExperienceYears } from "@/lib/experience";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -33,7 +34,19 @@ const itemVariants: Variants = {
   },
 };
 
-export function Hero() {
+// Static stats that don't change
+const staticStats = [
+  { value: "30+", label: "Engineers Managed" },
+  { value: "30%", label: "Efficiency Boost" },
+  { value: "ISO", label: "27001/9001" },
+] as const;
+
+interface HeroProps {
+  experience: ExperienceYears;
+}
+
+export function Hero({ experience }: HeroProps) {
+  
   const handleScroll = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -102,7 +115,7 @@ export function Hero() {
           variants={itemVariants}
           className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed"
         >
-          8+ years in software development with 5+ years in
+          {experience.totalYearsDisplay} years in software development with {experience.leadershipYearsDisplay} years in
           leadership. Expert in Agile methodologies, DevOps practices,
           and cloud infrastructure (AWS). Passionate about empowering
           teams to deliver scalable, secure, and high-impact
@@ -152,19 +165,34 @@ export function Hero() {
           variants={itemVariants}
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
         >
-          {[
-            { value: "30+", label: "Engineers Managed" },
-            { value: "8+", label: "Years in Tech" },
-            { value: "30%", label: "Efficiency Boost" },
-            { value: "ISO", label: "27001/9001" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted">{stat.label}</div>
+          {/* Engineers Managed */}
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+              30+
             </div>
-          ))}
+            <div className="text-sm text-muted">Engineers Managed</div>
+          </div>
+          {/* Years in Tech - Dynamic */}
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+              {experience.totalYearsDisplay}
+            </div>
+            <div className="text-sm text-muted">Years in Tech</div>
+          </div>
+          {/* Efficiency Boost */}
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+              30%
+            </div>
+            <div className="text-sm text-muted">Efficiency Boost</div>
+          </div>
+          {/* ISO */}
+          <div className="text-center">
+            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+              ISO
+            </div>
+            <div className="text-sm text-muted">27001/9001</div>
+          </div>
         </motion.div>
 
         {/* Scroll Indicator */}

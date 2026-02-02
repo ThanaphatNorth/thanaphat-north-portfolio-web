@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+export const runtime = "edge";
+
 export const size = {
   width: 180,
   height: 180,
@@ -11,27 +13,37 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          fontSize: 72,
-          background: "linear-gradient(135deg, #0a0a0a 0%, #171717 100%)",
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 40,
-          border: "4px solid #3b82f6",
+          backgroundColor: "#0a0a0a",
+          borderRadius: "36px",
         }}
       >
-        <span
+        <div
           style={{
-            color: "#fafafa",
-            fontWeight: "bold",
-            fontFamily: "system-ui, sans-serif",
-            letterSpacing: "-2px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "160px",
+            height: "160px",
+            borderRadius: "32px",
+            border: "4px solid #3b82f6",
           }}
         >
-          TN
-        </span>
+          <span
+            style={{
+              fontSize: "72px",
+              fontWeight: "bold",
+              color: "#fafafa",
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            TN
+          </span>
+        </div>
       </div>
     ),
     {

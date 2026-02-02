@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "./Button";
@@ -13,6 +13,14 @@ interface ContactFormData {
   service?: string;
   message: string;
 }
+
+const initialFormData: ContactFormData = {
+  name: "",
+  email: "",
+  company: "",
+  service: "",
+  message: "",
+};
 
 async function submitContactForm(data: ContactFormData) {
   const response = await fetch("/api/contact", {
@@ -37,7 +45,7 @@ interface ContactFormModalProps {
   prefilledService?: string;
 }
 
-type FormStatus = "idle" | "submitting" | "success" | "error";
+type FormStatus = "idle" | "success" | "error";
 
 export function ContactFormModal({
   isOpen,
@@ -45,50 +53,46 @@ export function ContactFormModal({
   prefilledService,
 }: ContactFormModalProps) {
   const [formData, setFormData] = useState<ContactFormData>({
-    name: "",
-    email: "",
-    company: "",
+    ...initialFormData,
     service: prefilledService || "",
-    message: "",
   });
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  // Use useTransition for better loading state management
+  const [isPending, startTransition] = useTransition();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  // Stable callback using functional setState
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("submitting");
     setErrorMessage("");
 
-    try {
-      await submitContactForm(formData);
-      setStatus("success");
-      // Reset form after success
-      setTimeout(() => {
-        setFormData({
-          name: "",
-          email: "",
-          company: "",
-          service: "",
-          message: "",
-        });
-      }, 2000);
-    } catch (error) {
-      setStatus("error");
-      setErrorMessage(
-        error instanceof Error ? error.message : "Something went wrong"
-      );
-    }
+    startTransition(async () => {
+      try {
+        await submitContactForm(formData);
+        setStatus("success");
+        // Reset form after success
+        setTimeout(() => {
+          setFormData(initialFormData);
+        }, 2000);
+      } catch (error) {
+        setStatus("error");
+        setErrorMessage(
+          error instanceof Error ? error.message : "Something went wrong"
+        );
+      }
+    });
   };
 
-  const handleClose = () => {
-    if (status !== "submitting") {
+  const handleClose = useCallback(() => {
+    if (!isPending) {
       onClose();
       // Reset status after modal closes
       setTimeout(() => {
@@ -96,7 +100,7 @@ export function ContactFormModal({
         setErrorMessage("");
       }, 300);
     }
-  };
+  }, [isPending, onClose]);
 
   const inputClasses =
     "w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all";
@@ -130,7 +134,8 @@ export function ContactFormModal({
               <button
                 onClick={handleClose}
                 className="p-2 text-muted hover:text-foreground transition-colors rounded-lg hover:bg-background"
-                disabled={status === "submitting"}
+                disabled={isPending}
+                aria-label="Close modal"
               >
                 <X size={20} />
               </button>
@@ -292,16 +297,16 @@ export function ContactFormModal({
                     variant="primary"
                     size="lg"
                     className="w-full"
-                    disabled={status === "submitting"}
+                    disabled={isPending}
                     leftIcon={
-                      status === "submitting" ? (
+                      isPending ? (
                         <Loader2 size={20} className="animate-spin" />
                       ) : (
                         <Send size={20} />
                       )
                     }
                   >
-                    {status === "submitting" ? "Sending..." : "Send Message"}
+                    {isPending ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               )}

@@ -21,6 +21,7 @@ const adminNavLinks = [
   { href: "/admin", label: "Contacts", icon: Inbox },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/ventures", label: "Ventures", icon: Rocket },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminNavigation() {
