@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Thanaphat Chirutpadathorn (North) - Engineering Manager & Tech Entrepreneur";
+export const alt = "ฐานพัฒน์ จิรุตม์ผะดาทร (Thanaphat North) - Engineering Manager & Software Developer | Freelance พัฒนาระบบ";
 export const size = {
   width: 1200,
   height: 630,
@@ -110,7 +110,7 @@ export default async function OGImage() {
               textAlign: "center",
             }}
           >
-            Engineering Manager & Tech Entrepreneur
+            Engineering Manager & Software Developer
           </p>
 
           {/* Description */}
@@ -125,7 +125,7 @@ export default async function OGImage() {
               lineHeight: 1.5,
             }}
           >
-            8+ years in software development • 5+ years in leadership
+            8+ years in Software Development • Agile Expert • Freelance Available
           </p>
         </div>
 

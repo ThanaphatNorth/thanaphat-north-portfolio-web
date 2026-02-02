@@ -38,9 +38,9 @@ export function Footer() {
               North<span className="text-accent">.</span>
             </motion.a>
             <p className="text-muted leading-relaxed mb-6 max-w-md">
-              Engineering Manager and Tech Entrepreneur focused on building
-              high-performing teams and scalable systems. Let&apos;s create
-              something amazing together.
+              Engineering Manager and Tech Entrepreneur focused on
+              building high-performing teams and scalable systems.
+              Let&apos;s create something amazing together.
             </p>
 
             {/* Social Links */}
@@ -78,7 +78,9 @@ export function Footer() {
 
           {/* Navigation Links */}
           <div>
-            <h3 className="text-foreground font-semibold mb-4">Navigation</h3>
+            <h3 className="text-foreground font-semibold mb-4">
+              Navigation
+            </h3>
             <ul className="space-y-3">
               {navLinks.map((link) => (
                 <li key={link.href}>
@@ -95,7 +97,9 @@ export function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-foreground font-semibold mb-4">Get in Touch</h3>
+            <h3 className="text-foreground font-semibold mb-4">
+              Get in Touch
+            </h3>
             <ul className="space-y-3">
               <li>
                 <a
@@ -109,7 +113,9 @@ export function Footer() {
                 <span className="text-muted">Bangkok, Thailand</span>
               </li>
               <li>
-                <span className="text-muted">Available for remote work</span>
+                <span className="text-muted">
+                  Available for remote work
+                </span>
               </li>
             </ul>
           </div>
@@ -119,14 +125,20 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted flex items-center gap-1">
             © {currentYear} {siteConfig.name}. Built with{" "}
-            <Heart className="w-4 h-4 text-red-500 fill-red-500" /> using
-            Next.js
+            <Heart className="w-4 h-4 text-red-500 fill-red-500" />{" "}
+            using Next.js
           </p>
           <div className="flex items-center gap-6 text-sm text-muted">
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
               Privacy Policy
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="#"
+              className="hover:text-foreground transition-colors"
+            >
               Terms of Service
             </a>
           </div>

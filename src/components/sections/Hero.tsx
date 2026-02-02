@@ -1,7 +1,12 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import { ArrowDown, Briefcase, MessageSquare, Download } from "lucide-react";
+import {
+  ArrowDown,
+  Briefcase,
+  MessageSquare,
+  Download,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/constants";
 
@@ -85,8 +90,7 @@ export function Hero() {
           variants={itemVariants}
           className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
         >
-          Engineering Manager{" "}
-          <span className="text-muted">|</span>{" "}
+          Engineering Manager <span className="text-muted">|</span>{" "}
           <br className="hidden md:block" />
           <span className="gradient-text">Scaling Teams</span>
           <span className="text-muted"> & </span>
@@ -98,9 +102,11 @@ export function Hero() {
           variants={itemVariants}
           className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed"
         >
-          8+ years in software development with 5+ years in leadership. 
-          Expert in Agile methodologies, DevOps practices, and cloud infrastructure (AWS). 
-          Passionate about empowering teams to deliver scalable, secure, and high-impact solutions.
+          8+ years in software development with 5+ years in
+          leadership. Expert in Agile methodologies, DevOps practices,
+          and cloud infrastructure (AWS). Passionate about empowering
+          teams to deliver scalable, secure, and high-impact
+          solutions.
         </motion.p>
 
         {/* CTAs */}
@@ -133,7 +139,10 @@ export function Hero() {
             download="Thanaphat-Chirutpadathorn-Resume.pdf"
             className="inline-flex items-center gap-2 text-muted hover:text-accent transition-colors text-sm font-medium group"
           >
-            <Download size={16} className="group-hover:animate-bounce" />
+            <Download
+              size={16}
+              className="group-hover:animate-bounce"
+            />
             Download Resume (PDF)
           </a>
         </motion.div>
@@ -167,10 +176,16 @@ export function Hero() {
             onClick={() => handleScroll("#impact")}
             className="flex flex-col items-center gap-2 text-muted hover:text-foreground transition-colors"
             animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            transition={{
+              repeat: Infinity,
+              duration: 2,
+              ease: "easeInOut",
+            }}
             aria-label="Scroll to next section"
           >
-            <span className="text-xs uppercase tracking-wider">Scroll</span>
+            <span className="text-xs uppercase tracking-wider">
+              Scroll
+            </span>
             <ArrowDown size={20} />
           </motion.button>
         </motion.div>

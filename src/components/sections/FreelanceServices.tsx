@@ -2,8 +2,19 @@
 
 import { useState } from "react";
 import { motion, Variants } from "framer-motion";
-import { Lightbulb, Target, Code, Users, ArrowRight, CheckCircle, MessageSquare } from "lucide-react";
-import { SectionWrapper, SectionHeader } from "@/components/ui/SectionWrapper";
+import {
+  Lightbulb,
+  Target,
+  Code,
+  Users,
+  ArrowRight,
+  CheckCircle,
+  MessageSquare,
+} from "lucide-react";
+import {
+  SectionWrapper,
+  SectionHeader,
+} from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
 import { ContactFormModal } from "@/components/ui/ContactFormModal";
 import { services } from "@/lib/constants";
@@ -67,7 +78,8 @@ export function FreelanceServices() {
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           {services.map((service, index) => {
-            const Icon = iconMap[service.icon as keyof typeof iconMap];
+            const Icon =
+              iconMap[service.icon as keyof typeof iconMap];
 
             return (
               <motion.div
@@ -147,8 +159,8 @@ export function FreelanceServices() {
           className="mt-12 text-center"
         >
           <p className="text-muted mb-6">
-            Not sure which service fits your needs? Let&apos;s discuss your
-            requirements.
+            Not sure which service fits your needs? Let&apos;s discuss
+            your requirements.
           </p>
           <Button
             variant="primary"

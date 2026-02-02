@@ -30,24 +30,59 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
+    // Thai name variations
+    "ฐานพัฒน์ จิรุตม์ผะดาทร",
+    "ฐานพัฒน์",
+    "Thanaphat Chirutpadathorn",
+    "Thanaphat North",
+    // Core roles
     "Engineering Manager",
+    "Software Developer",
+    "Software Development",
     "Tech Lead",
     "Software Architect",
     "Full-Stack Developer",
+    // Thai keywords
+    "พัฒนาระบบ",
+    "พัฒนา software",
+    "พัฒนาซอฟต์แวร์",
+    "นักพัฒนาซอฟต์แวร์",
+    "โปรแกรมเมอร์",
+    // Freelance
+    "Freelance",
+    "Freelance Developer",
+    "Freelance Software Developer",
+    "รับพัฒนาระบบ",
+    "รับทำเว็บ",
+    "รับทำแอพ",
+    // Agile & methodology
+    "Agile",
+    "Scrum",
+    "Agile Coach",
+    // Technologies
+    "Software",
     "React",
     "Next.js",
     "Node.js",
     "AWS",
+    "TypeScript",
+    // Other
     "Team Leadership",
-    "Agile",
     "Startup Advisor",
     "Thailand",
   ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  alternates: {
+    languages: {
+      "en-US": siteConfig.url,
+      "th-TH": siteConfig.url,
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
+    alternateLocale: ["th_TH"],
     url: siteConfig.url,
     title: siteConfig.title,
     description: siteConfig.description,
@@ -81,14 +116,15 @@ export const metadata: Metadata = {
   },
 };
 
-// JSON-LD Structured Data
-const jsonLd = {
+// JSON-LD Structured Data for Person
+const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Thanaphat Chirutpadathorn (North)",
+  alternateName: ["ฐานพัฒน์ จิรุตม์ผะดาทร", "Thanaphat North", "North"],
   url: siteConfig.url,
   image: `${siteConfig.url}/profile.jpg`,
-  jobTitle: "Engineering Manager",
+  jobTitle: ["Engineering Manager", "Software Developer", "Freelance Developer"],
   worksFor: {
     "@type": "Organization",
     name: "Invitrace",
@@ -97,12 +133,58 @@ const jsonLd = {
   sameAs: [siteConfig.links.linkedin, siteConfig.links.github],
   knowsAbout: [
     "Software Engineering",
+    "Software Development",
+    "พัฒนาระบบ",
+    "พัฒนา Software",
     "Team Leadership",
     "Agile Methodologies",
+    "Agile",
+    "Scrum",
     "Cloud Architecture",
     "React",
     "Node.js",
     "AWS",
+    "Freelance Development",
+  ],
+  hasOccupation: [
+    {
+      "@type": "Occupation",
+      name: "Engineering Manager",
+      occupationalCategory: "15-1252.00",
+    },
+    {
+      "@type": "Occupation",
+      name: "Software Developer",
+      occupationalCategory: "15-1252.00",
+    },
+  ],
+};
+
+// JSON-LD for Freelance Service
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "Thanaphat North - Freelance Software Development",
+  alternateName: "ฐานพัฒน์ - รับพัฒนาระบบ Freelance",
+  description: "Freelance Software Development Services - พัฒนาระบบ, พัฒนา Software, Web & Mobile Applications",
+  url: siteConfig.url,
+  provider: {
+    "@type": "Person",
+    name: "Thanaphat Chirutpadathorn",
+    alternateName: "ฐานพัฒน์ จิรุตม์ผะดาทร",
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "Thailand",
+  },
+  serviceType: [
+    "Software Development",
+    "Web Development",
+    "Mobile App Development",
+    "Agile Consulting",
+    "Technical Advisory",
+    "พัฒนาระบบ",
+    "พัฒนา Software",
   ],
 };
 
@@ -117,7 +199,11 @@ export default function RootLayout({
         <link rel="canonical" href={siteConfig.url} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
         />
       </head>
       <body

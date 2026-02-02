@@ -1,6 +1,8 @@
 export const siteConfig = {
   name: "Thanaphat (North)",
-  title: "Thanaphat Chirutpadathorn (North) | Engineering Manager & Tech Entrepreneur",
+  title:
+    "Thanaphat Chirutpadathorn (North) | Engineering Manager & Tech Entrepreneur",
+  nameThai: "ฐานพัฒน์ จิรุตม์ผะดาทร",
   description:
     "Engineering Manager with 8+ years of software development experience and 5+ years in leadership roles. Specialized in scaling high-performing teams and building robust systems.",
   url: "https://thanaphat-north.com",
