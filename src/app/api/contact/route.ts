@@ -31,17 +31,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert into Supabase
-    const { error: dbError } = await supabase.from("contacts").insert([
-      {
-        name,
-        email,
-        company: company || null,
-        service: service || null,
-        message,
-        created_at: new Date().toISOString(),
-        read: false,
-      },
-    ]);
+    const { error: dbError } = await supabase
+      .from("contacts")
+      .insert([
+        {
+          name,
+          email,
+          company: company || null,
+          service: service || null,
+          message,
+          created_at: new Date().toISOString(),
+          read: false,
+        },
+      ]);
 
     if (dbError) {
       console.error("Database error:", dbError);
@@ -52,14 +54,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email notification via Resend
-    const adminEmail = process.env.ADMIN_EMAIL || "north.thanaphat@gmail.com";
+    const adminEmail =
+      process.env.ADMIN_EMAIL || "north.thanaphat@gmail.com";
     const emailSubject = service
       ? `New Contact: ${service} - ${name}`
       : `New Contact from ${name}`;
 
     try {
       await resend.emails.send({
-        from: "Portfolio Contact <contact@thanaphatnorth.com>",
+        from: "Portfolio Contact <thanaphat-north@resend.dev>",
         to: adminEmail,
         subject: emailSubject,
         html: `
@@ -92,21 +95,32 @@ export async function POST(request: NextRequest) {
                   <div class="label">Email</div>
                   <div class="value"><a href="mailto:${email}">${email}</a></div>
                 </div>
-                ${company ? `
+                ${
+                  company
+                    ? `
                 <div class="field">
                   <div class="label">Company</div>
                   <div class="value">${company}</div>
                 </div>
-                ` : ""}
-                ${service ? `
+                `
+                    : ""
+                }
+                ${
+                  service
+                    ? `
                 <div class="field">
                   <div class="label">Service Interested In</div>
                   <div class="value">${service}</div>
                 </div>
-                ` : ""}
+                `
+                    : ""
+                }
                 <div class="field">
                   <div class="label">Message</div>
-                  <div class="message-box">${message.replace(/\n/g, "<br>")}</div>
+                  <div class="message-box">${message.replace(
+                    /\n/g,
+                    "<br>"
+                  )}</div>
                 </div>
               </div>
               <div class="footer">
