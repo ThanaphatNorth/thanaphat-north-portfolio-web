@@ -290,3 +290,103 @@ INSERT INTO site_settings (key, value, description) VALUES
   ('career_start_date', '2017-06-01', 'Start date for calculating total years in software development'),
   ('leadership_start_date', '2021-01-01', 'Start date for calculating years in leadership roles')
 ON CONFLICT (key) DO NOTHING;
+
+-- ============================================
+-- Portfolios Table - For project showcase
+-- ============================================
+
+-- 31. CREATE PORTFOLIOS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS portfolios (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  content TEXT,
+  cover_image TEXT,
+  images TEXT[] DEFAULT '{}',
+  technologies TEXT[] DEFAULT '{}',
+  category TEXT NOT NULL DEFAULT 'Web App',
+  client_name TEXT,
+  project_url TEXT,
+  github_url TEXT,
+  featured BOOLEAN DEFAULT FALSE,
+  visible BOOLEAN DEFAULT TRUE,
+  display_order INTEGER DEFAULT 0,
+  completed_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 32. CREATE INDEXES FOR PORTFOLIOS
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_portfolios_slug ON portfolios(slug);
+CREATE INDEX IF NOT EXISTS idx_portfolios_visible ON portfolios(visible);
+CREATE INDEX IF NOT EXISTS idx_portfolios_featured ON portfolios(featured);
+CREATE INDEX IF NOT EXISTS idx_portfolios_display_order ON portfolios(display_order);
+CREATE INDEX IF NOT EXISTS idx_portfolios_category ON portfolios(category);
+
+-- 33. ENABLE RLS FOR PORTFOLIOS
+-- ============================================
+ALTER TABLE portfolios ENABLE ROW LEVEL SECURITY;
+
+-- 34. DROP EXISTING PORTFOLIOS POLICIES (if re-running)
+-- ============================================
+DROP POLICY IF EXISTS "Allow public to read visible portfolios" ON portfolios;
+DROP POLICY IF EXISTS "Allow authenticated users full access to portfolios" ON portfolios;
+
+-- 35. CREATE RLS POLICIES FOR PORTFOLIOS
+-- ============================================
+
+-- Policy: Allow anyone to read visible portfolios
+CREATE POLICY "Allow public to read visible portfolios" ON portfolios
+  FOR SELECT
+  TO anon, authenticated
+  USING (visible = TRUE);
+
+-- Policy: Allow authenticated users FULL access (for admin)
+CREATE POLICY "Allow authenticated users full access to portfolios" ON portfolios
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- 36. CREATE TRIGGER FOR portfolios updated_at
+-- ============================================
+DROP TRIGGER IF EXISTS update_portfolios_updated_at ON portfolios;
+CREATE TRIGGER update_portfolios_updated_at
+  BEFORE UPDATE ON portfolios
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 37. CREATE STORAGE BUCKET FOR PORTFOLIO IMAGES
+-- Run this in Supabase Dashboard > Storage > Create new bucket
+-- Bucket name: portfolio-images
+-- Public bucket: Yes (so images can be viewed by anyone)
+
+-- 38. STORAGE POLICIES FOR PORTFOLIO IMAGES (run in SQL Editor)
+-- ============================================
+
+-- Allow authenticated users to upload portfolio images
+CREATE POLICY "Allow authenticated portfolio uploads" ON storage.objects
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'portfolio-images');
+
+-- Allow authenticated users to update portfolio uploads
+CREATE POLICY "Allow authenticated portfolio updates" ON storage.objects
+  FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'portfolio-images');
+
+-- Allow authenticated users to delete portfolio images
+CREATE POLICY "Allow authenticated portfolio deletes" ON storage.objects
+  FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'portfolio-images');
+
+-- Allow public read access to portfolio images
+CREATE POLICY "Allow public portfolio read access" ON storage.objects
+  FOR SELECT
+  TO public
+  USING (bucket_id = 'portfolio-images');

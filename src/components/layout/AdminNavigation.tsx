@@ -12,6 +12,7 @@ import {
   Home,
   Settings,
   Rocket,
+  FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 const adminNavLinks = [
   { href: "/admin", label: "Contacts", icon: Inbox },
   { href: "/admin/blog", label: "Blog", icon: FileText },
+  { href: "/admin/portfolio", label: "Portfolio", icon: FolderOpen },
   { href: "/admin/ventures", label: "Ventures", icon: Rocket },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
@@ -111,7 +113,9 @@ export function AdminNavigation() {
               className="hidden md:flex items-center gap-2 px-4 py-2 text-sm text-muted hover:text-foreground transition-colors rounded-lg hover:bg-background disabled:opacity-50"
             >
               <LogOut size={18} />
-              <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+              <span>
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </span>
             </button>
 
             {/* Mobile Menu Button */}
@@ -121,7 +125,11 @@ export function AdminNavigation() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMobileMenuOpen ? (
+                <X size={24} />
+              ) : (
+                <Menu size={24} />
+              )}
             </motion.button>
           </div>
         </nav>
@@ -146,7 +154,11 @@ export function AdminNavigation() {
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 200,
+              }}
               className="fixed top-0 right-0 bottom-0 w-[280px] bg-card border-l border-border z-50 md:hidden"
             >
               <div className="flex flex-col h-full p-6">

@@ -54,38 +54,42 @@ export async function getUser() {
  * Get experience years from database (server-side)
  * Uses React.cache() for per-request deduplication
  */
-export const getExperienceYears = cache(async (): Promise<ExperienceYears> => {
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("key, value")
-      .in("key", ["career_start_date", "leadership_start_date"]);
+export const getExperienceYears = cache(
+  async (): Promise<ExperienceYears> => {
+    try {
+      const supabase = await createSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["career_start_date", "leadership_start_date"]);
 
-    if (error) {
-      console.warn("Error fetching experience settings:", error);
+      if (error) {
+        console.warn("Error fetching experience settings:", error);
+        return getDefaultExperienceYears();
+      }
+
+      const settings = data as { key: string; value: string }[];
+      const careerSetting = settings.find(
+        (s) => s.key === "career_start_date"
+      );
+      const leadershipSetting = settings.find(
+        (s) => s.key === "leadership_start_date"
+      );
+
+      if (careerSetting && leadershipSetting) {
+        return calculateExperienceYears(
+          careerSetting.value,
+          leadershipSetting.value
+        );
+      }
+
+      return getDefaultExperienceYears();
+    } catch (err) {
+      console.warn("Error fetching experience settings:", err);
       return getDefaultExperienceYears();
     }
-
-    const settings = data as { key: string; value: string }[];
-    const careerSetting = settings.find((s) => s.key === "career_start_date");
-    const leadershipSetting = settings.find(
-      (s) => s.key === "leadership_start_date"
-    );
-
-    if (careerSetting && leadershipSetting) {
-      return calculateExperienceYears(
-        careerSetting.value,
-        leadershipSetting.value
-      );
-    }
-
-    return getDefaultExperienceYears();
-  } catch (err) {
-    console.warn("Error fetching experience settings:", err);
-    return getDefaultExperienceYears();
   }
-});
+);
 
 /**
  * Venture item interface
@@ -129,3 +133,54 @@ export const getVentures = cache(async (): Promise<VentureItem[]> => {
     return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
   }
 });
+
+/**
+ * Portfolio item interface for server-side
+ */
+export interface PortfolioItem {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  content: string | null;
+  cover_image: string | null;
+  images: string[];
+  technologies: string[];
+  category: string;
+  client_name: string | null;
+  project_url: string | null;
+  github_url: string | null;
+  featured: boolean;
+  visible: boolean;
+  display_order: number;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Get portfolios from database (server-side)
+ * Uses React.cache() for per-request deduplication
+ */
+export const getPortfolios = cache(
+  async (): Promise<PortfolioItem[]> => {
+    try {
+      const supabase = await createSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("portfolios")
+        .select("*")
+        .eq("visible", true)
+        .order("display_order", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching portfolios:", error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching portfolios:", error);
+      return [];
+    }
+  }
+);
