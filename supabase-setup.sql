@@ -303,7 +303,15 @@ CREATE TABLE IF NOT EXISTS portfolios (
   slug TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   content TEXT,
+  -- Case Study Sections
+  case_overview TEXT,
+  case_components TEXT,
+  case_team TEXT,
+  case_outcome TEXT,
+  -- End Case Study Sections
   cover_image TEXT,
+  cover_image_focal_x INTEGER DEFAULT 50,
+  cover_image_focal_y INTEGER DEFAULT 50,
   images TEXT[] DEFAULT '{}',
   technologies TEXT[] DEFAULT '{}',
   category TEXT NOT NULL DEFAULT 'Web App',
@@ -317,6 +325,16 @@ CREATE TABLE IF NOT EXISTS portfolios (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Add case study columns to existing portfolios table (run if table already exists)
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS case_overview TEXT;
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS case_components TEXT;
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS case_team TEXT;
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS case_outcome TEXT;
+
+-- Add focal point columns (run if table already exists)
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS cover_image_focal_x INTEGER DEFAULT 50;
+-- ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS cover_image_focal_y INTEGER DEFAULT 50;
 
 -- 32. CREATE INDEXES FOR PORTFOLIOS
 -- ============================================

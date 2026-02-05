@@ -72,7 +72,15 @@ export interface Portfolio {
   slug: string;
   description: string;
   content: string | null;
+  // Case Study Sections
+  case_overview: string | null;
+  case_components: string | null;
+  case_team: string | null;
+  case_outcome: string | null;
+  // End Case Study Sections
   cover_image: string | null;
+  cover_image_focal_x: number;
+  cover_image_focal_y: number;
   images: string[];
   technologies: string[];
   category: string;
@@ -92,7 +100,15 @@ export interface PortfolioFormData {
   slug: string;
   description: string;
   content?: string;
+  // Case Study Sections
+  case_overview?: string;
+  case_components?: string;
+  case_team?: string;
+  case_outcome?: string;
+  // End Case Study Sections
   cover_image?: string;
+  cover_image_focal_x?: number;
+  cover_image_focal_y?: number;
   images?: string[];
   technologies?: string[];
   category?: string;

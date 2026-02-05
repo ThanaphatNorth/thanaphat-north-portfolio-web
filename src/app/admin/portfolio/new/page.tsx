@@ -3,19 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Save,
-  Eye,
-  Loader2,
-  Plus,
-  X,
-  Upload,
-  Link as LinkIcon,
-  Image as ImageIcon,
-} from "lucide-react";
+import { ArrowLeft, Save, Eye, Loader2, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { CoverImageUpload } from "@/components/ui/CoverImageUpload";
+import { MultiImageUpload } from "@/components/ui/MultiImageUpload";
 
 const categoryOptions = [
   "Web App",
@@ -39,13 +31,20 @@ export default function NewPortfolioPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [techInput, setTechInput] = useState("");
-  const [imageUrlInput, setImageUrlInput] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     description: "",
     content: "",
+    // Case Study Sections
+    case_overview: "",
+    case_components: "",
+    case_team: "",
+    case_outcome: "",
+    // End Case Study Sections
     cover_image: "",
+    cover_image_focal_x: 50,
+    cover_image_focal_y: 50,
     images: [] as string[],
     technologies: [] as string[],
     category: "Web App",
@@ -92,24 +91,6 @@ export default function NewPortfolioPage() {
     }));
   };
 
-  const handleAddImage = () => {
-    const url = imageUrlInput.trim();
-    if (url && !formData.images.includes(url)) {
-      setFormData((prev) => ({
-        ...prev,
-        images: [...prev.images, url],
-      }));
-      setImageUrlInput("");
-    }
-  };
-
-  const handleRemoveImage = (url: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((img) => img !== url),
-    }));
-  };
-
   const handleSubmit = async (
     e: React.FormEvent,
     makeVisible: boolean = true
@@ -128,7 +109,15 @@ export default function NewPortfolioPage() {
         slug: formData.slug.trim() || generateSlug(formData.title),
         description: formData.description.trim(),
         content: formData.content.trim() || null,
+        // Case Study Sections
+        case_overview: formData.case_overview.trim() || null,
+        case_components: formData.case_components.trim() || null,
+        case_team: formData.case_team.trim() || null,
+        case_outcome: formData.case_outcome.trim() || null,
+        // End Case Study Sections
         cover_image: formData.cover_image.trim() || null,
+        cover_image_focal_x: formData.cover_image_focal_x,
+        cover_image_focal_y: formData.cover_image_focal_y,
         images: formData.images,
         technologies: formData.technologies,
         category: formData.category,
@@ -255,55 +244,119 @@ export default function NewPortfolioPage() {
           />
         </div>
 
-        {/* Content */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Full Description / Case Study
-          </label>
-          <textarea
-            value={formData.content}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                content: e.target.value,
-              }))
-            }
-            placeholder="Detailed description, challenges, solutions..."
-            rows={6}
-            className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors resize-none"
-          />
+        {/* Case Study Sections */}
+        <div className="space-y-6 p-4 bg-background border border-border rounded-lg">
+          <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+            Case Study / Project Details
+          </h3>
+          <p className="text-xs text-muted -mt-4">
+            Supports Markdown: **bold**, *italic*, # headers, - lists,
+            [links](url), `code`
+          </p>
+
+          {/* 1. Overview */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              1. Overview
+            </label>
+            <textarea
+              value={formData.case_overview}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  case_overview: e.target.value,
+                }))
+              }
+              placeholder="What is this project about? Brief summary of the project scope and objectives..."
+              rows={4}
+              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors resize-none font-mono text-sm"
+            />
+          </div>
+
+          {/* 2. Project Component */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              2. Project Component
+            </label>
+            <textarea
+              value={formData.case_components}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  case_components: e.target.value,
+                }))
+              }
+              placeholder="What are the main components/features of this project? List the key modules, features, or parts..."
+              rows={4}
+              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors resize-none font-mono text-sm"
+            />
+          </div>
+
+          {/* 3. Team Member */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              3. Team Member
+            </label>
+            <textarea
+              value={formData.case_team}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  case_team: e.target.value,
+                }))
+              }
+              placeholder="Who was involved? Team size, roles, structure..."
+              rows={3}
+              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors resize-none font-mono text-sm"
+            />
+          </div>
+
+          {/* 4. What I Contribute (Outcome) */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              4. What I Contribute (Outcome)
+            </label>
+            <textarea
+              value={formData.case_outcome}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  case_outcome: e.target.value,
+                }))
+              }
+              placeholder="What was the result? Key achievements, metrics, impact..."
+              rows={4}
+              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors resize-none font-mono text-sm"
+            />
+          </div>
         </div>
 
         {/* Cover Image */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">
-            Cover Image URL
+            Cover Image
           </label>
-          <input
-            type="url"
+          <CoverImageUpload
             value={formData.cover_image}
-            onChange={(e) =>
+            onChange={(url) =>
               setFormData((prev) => ({
                 ...prev,
-                cover_image: e.target.value,
+                cover_image: url,
               }))
             }
-            placeholder="https://example.com/cover.jpg"
-            className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors"
+            focalPoint={{
+              x: formData.cover_image_focal_x,
+              y: formData.cover_image_focal_y,
+            }}
+            onFocalPointChange={(point) =>
+              setFormData((prev) => ({
+                ...prev,
+                cover_image_focal_x: point.x,
+                cover_image_focal_y: point.y,
+              }))
+            }
+            bucket="portfolio-images"
           />
-          {formData.cover_image && (
-            <div className="mt-3 relative inline-block">
-              <img
-                src={formData.cover_image}
-                alt="Cover preview"
-                className="h-32 rounded-lg object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display =
-                    "none";
-                }}
-              />
-            </div>
-          )}
         </div>
 
         {/* Gallery Images */}
@@ -311,50 +364,16 @@ export default function NewPortfolioPage() {
           <label className="block text-sm font-medium text-foreground mb-2">
             Gallery Images
           </label>
-          <div className="flex gap-2 mb-3">
-            <input
-              type="url"
-              value={imageUrlInput}
-              onChange={(e) => setImageUrlInput(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddImage();
-                }
-              }}
-              className="flex-1 px-4 py-2 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors"
-            />
-            <button
-              type="button"
-              onClick={handleAddImage}
-              aria-label="Add image"
-              className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-          {formData.images.length > 0 && (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {formData.images.map((url, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Gallery ${index + 1}`}
-                    className="w-full aspect-video object-cover rounded-lg border border-border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(url)}
-                    aria-label={`Remove image ${index + 1}`}
-                    className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <MultiImageUpload
+            value={formData.images}
+            onChange={(urls) =>
+              setFormData((prev) => ({
+                ...prev,
+                images: urls,
+              }))
+            }
+            bucket="portfolio-images"
+          />
         </div>
 
         {/* Category & Client Row */}
