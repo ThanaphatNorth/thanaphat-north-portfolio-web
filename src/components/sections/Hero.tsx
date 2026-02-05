@@ -46,7 +46,6 @@ interface HeroProps {
 }
 
 export function Hero({ experience }: HeroProps) {
-  
   const handleScroll = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -103,11 +102,11 @@ export function Hero({ experience }: HeroProps) {
           variants={itemVariants}
           className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
         >
-          Engineering Manager <span className="text-muted">|</span>{" "}
+          Software Engineering Consultant & Leader
           <br className="hidden md:block" />
-          <span className="gradient-text">Scaling Teams</span>
-          <span className="text-muted"> & </span>
-          <span className="gradient-text">Systems</span>
+          <span className="gradient-text">
+            Building High-Performance Teams
+          </span>
         </motion.h1>
 
         {/* Sub-headline */}
@@ -115,10 +114,11 @@ export function Hero({ experience }: HeroProps) {
           variants={itemVariants}
           className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-10 leading-relaxed"
         >
-          {experience.totalYearsDisplay} years in software development with {experience.leadershipYearsDisplay} years in
-          leadership. Expert in Agile methodologies, DevOps practices,
-          and cloud infrastructure (AWS). Passionate about empowering
-          teams to deliver scalable, secure, and high-impact
+          {experience.totalYearsDisplay} years in software engineering
+          with {experience.leadershipYearsDisplay} years in leadership
+          roles. Specialized in Agile methodologies, DevOps practices,
+          and cloud infrastructure (AWS). Expert at building and
+          scaling engineering teams to deliver high-quality, impactful
           solutions.
         </motion.p>
 
@@ -170,7 +170,9 @@ export function Hero({ experience }: HeroProps) {
             <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
               30+
             </div>
-            <div className="text-sm text-muted">Engineers Managed</div>
+            <div className="text-sm text-muted">
+              Engineers Managed
+            </div>
           </div>
           {/* Years in Tech - Dynamic */}
           <div className="text-center">
