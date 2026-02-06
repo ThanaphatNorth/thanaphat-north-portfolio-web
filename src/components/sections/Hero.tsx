@@ -102,10 +102,10 @@ export function Hero({ experience }: HeroProps) {
           variants={itemVariants}
           className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
         >
-          Software Engineering Consultant & Leader
+          Tech Leader & Consultant
           <br className="hidden md:block" />
           <span className="gradient-text">
-            Building High-Performance Teams
+            Scaling Teams & Systems
           </span>
         </motion.h1>
 
