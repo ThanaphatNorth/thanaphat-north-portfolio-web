@@ -119,9 +119,19 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20 mb-3">
-              {portfolio.category}
-            </span>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {(portfolio.category || "")
+                .split(", ")
+                .filter(Boolean)
+                .map((type) => (
+                  <span
+                    key={type}
+                    className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20"
+                  >
+                    {type.trim()}
+                  </span>
+                ))}
+            </div>
             <h3 className="text-2xl md:text-3xl font-bold text-foreground text-pretty">
               {portfolio.title}
             </h3>
@@ -270,11 +280,11 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
           </div>
         ) : null}
 
-        {/* Technologies */}
+        {/* Skills */}
         {portfolio.technologies.length > 0 && (
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-foreground mb-3">
-              Technologies
+              Skills
             </h4>
             <div className="flex flex-wrap gap-2">
               {portfolio.technologies.map((tech) => (

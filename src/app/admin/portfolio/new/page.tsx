@@ -8,17 +8,10 @@ import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { CoverImageUpload } from "@/components/ui/CoverImageUpload";
 import { MultiImageUpload } from "@/components/ui/MultiImageUpload";
-
-const categoryOptions = [
-  "Web App",
-  "Mobile",
-  "Design",
-  "E-commerce",
-  "SaaS",
-  "API",
-  "Dashboard",
-  "Other",
-];
+import {
+  portfolioTypeOptions as typeOptions,
+  portfolioSkillOptions as skillOptions,
+} from "@/lib/constants";
 
 function generateSlug(title: string): string {
   return title
@@ -47,7 +40,7 @@ export default function NewPortfolioPage() {
     cover_image_focal_y: 50,
     images: [] as string[],
     technologies: [] as string[],
-    category: "Web App",
+    category: "",
     client_name: "",
     project_url: "",
     github_url: "",
@@ -376,66 +369,112 @@ export default function NewPortfolioPage() {
           />
         </div>
 
-        {/* Category & Client Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Category */}
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-foreground mb-2"
-            >
-              Category
-            </label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  category: e.target.value,
-                }))
-              }
-              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:border-accent transition-colors"
-            >
-              {categoryOptions.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Client Name */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Client Name
-            </label>
-            <input
-              type="text"
-              value={formData.client_name}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  client_name: e.target.value,
-                }))
-              }
-              placeholder="Company or client name"
-              className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors"
-            />
-          </div>
-        </div>
-
-        {/* Technologies */}
+        {/* Type (Multi-select) */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">
-            Technologies
+            Type
           </label>
+          <div className="flex flex-wrap gap-2">
+            {typeOptions.map((type) => {
+              const selectedTypes = formData.category
+                ? formData.category.split(", ").filter(Boolean)
+                : [];
+              const isSelected = selectedTypes.includes(type);
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => {
+                    const current = formData.category
+                      ? formData.category.split(", ").filter(Boolean)
+                      : [];
+                    const updated = isSelected
+                      ? current.filter((t) => t !== type)
+                      : [...current, type];
+                    setFormData((prev) => ({
+                      ...prev,
+                      category: updated.join(", "),
+                    }));
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                    isSelected
+                      ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
+                      : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
+                  }`}
+                >
+                  {type}
+                </button>
+              );
+            })}
+          </div>
+          {!formData.category && (
+            <p className="text-xs text-muted mt-2">
+              Select one or more types
+            </p>
+          )}
+        </div>
+
+        {/* Client Name */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Client Name
+          </label>
+          <input
+            type="text"
+            value={formData.client_name}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                client_name: e.target.value,
+              }))
+            }
+            placeholder="Company or client name"
+            className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:border-accent transition-colors"
+          />
+        </div>
+
+        {/* Skills */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Skills
+          </label>
+          {/* Quick select skill options */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {skillOptions.map((skill) => {
+              const isSelected =
+                formData.technologies.includes(skill);
+              return (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) {
+                      handleRemoveTech(skill);
+                    } else {
+                      setFormData((prev) => ({
+                        ...prev,
+                        technologies: [...prev.technologies, skill],
+                      }));
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                    isSelected
+                      ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
+                      : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
+                  }`}
+                >
+                  {skill}
+                </button>
+              );
+            })}
+          </div>
+          {/* Custom skill input */}
           <div className="flex gap-2 mb-3">
             <input
               type="text"
               value={techInput}
               onChange={(e) => setTechInput(e.target.value)}
-              placeholder="e.g., React, Node.js, PostgreSQL"
+              placeholder="Add custom skill, e.g., React, Node.js"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -447,30 +486,43 @@ export default function NewPortfolioPage() {
             <button
               type="button"
               onClick={handleAddTech}
-              aria-label="Add technology"
+              aria-label="Add skill"
               className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
             >
               <Plus size={18} />
             </button>
           </div>
-          {formData.technologies.length > 0 && (
+          {/* Selected skills (custom ones not in quick select) */}
+          {formData.technologies.filter(
+            (t) =>
+              !skillOptions.includes(
+                t as (typeof skillOptions)[number]
+              )
+          ).length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {formData.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg text-sm"
-                >
-                  {tech}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTech(tech)}
-                    aria-label={`Remove ${tech}`}
-                    className="text-muted hover:text-red-400 transition-colors"
+              {formData.technologies
+                .filter(
+                  (t) =>
+                    !skillOptions.includes(
+                      t as (typeof skillOptions)[number]
+                    )
+                )
+                .map((tech) => (
+                  <span
+                    key={tech}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg text-sm"
                   >
-                    <X size={14} />
-                  </button>
-                </span>
-              ))}
+                    {tech}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTech(tech)}
+                      aria-label={`Remove ${tech}`}
+                      className="text-muted hover:text-red-400 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </span>
+                ))}
             </div>
           )}
         </div>

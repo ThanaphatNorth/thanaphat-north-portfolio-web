@@ -19,12 +19,20 @@ import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type { Portfolio } from "@/lib/supabase";
 
-const categoryColors: Record<string, string> = {
+const typeColors: Record<string, string> = {
   "Web App": "bg-blue-500/20 text-blue-400",
   Mobile: "bg-green-500/20 text-green-400",
   Design: "bg-purple-500/20 text-purple-400",
   "E-commerce": "bg-orange-500/20 text-orange-400",
   SaaS: "bg-cyan-500/20 text-cyan-400",
+  API: "bg-indigo-500/20 text-indigo-400",
+  Dashboard: "bg-teal-500/20 text-teal-400",
+  Library: "bg-emerald-500/20 text-emerald-400",
+  Training: "bg-rose-500/20 text-rose-400",
+  Consulting: "bg-pink-500/20 text-pink-400",
+  Research: "bg-slate-500/20 text-slate-400",
+  Education: "bg-blue-500/20 text-blue-400",
+  Other: "bg-gray-500/20 text-gray-400",
 };
 
 export default function AdminPortfolioPage() {
@@ -233,14 +241,20 @@ export default function AdminPortfolioPage() {
                           <h2 className="text-lg font-semibold text-foreground truncate">
                             {portfolio.title}
                           </h2>
-                          <span
-                            className={`px-2 py-0.5 text-xs rounded-full ${
-                              categoryColors[portfolio.category] ||
-                              "bg-gray-500/20 text-gray-400"
-                            }`}
-                          >
-                            {portfolio.category}
-                          </span>
+                          {(portfolio.category || "")
+                            .split(", ")
+                            .filter(Boolean)
+                            .map((type) => (
+                              <span
+                                key={type}
+                                className={`px-2 py-0.5 text-xs rounded-full ${
+                                  typeColors[type.trim()] ||
+                                  "bg-gray-500/20 text-gray-400"
+                                }`}
+                              >
+                                {type.trim()}
+                              </span>
+                            ))}
                           {portfolio.featured && (
                             <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500/20 text-yellow-400">
                               Featured
@@ -255,21 +269,10 @@ export default function AdminPortfolioPage() {
                         <p className="text-muted text-sm mb-2 line-clamp-2">
                           {portfolio.description}
                         </p>
-                        <div className="flex items-center gap-3 flex-wrap">
-                          {portfolio.technologies
-                            .slice(0, 4)
-                            .map((tech) => (
-                              <span
-                                key={tech}
-                                className="text-xs px-2 py-0.5 bg-background rounded border border-border"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          {portfolio.technologies.length > 4 && (
-                            <span className="text-xs text-muted">
-                              +{portfolio.technologies.length - 4}{" "}
-                              more
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          {portfolio.technologies.length > 0 && (
+                            <span className="text-xs text-muted truncate">
+                              {portfolio.technologies.join(", ")}
                             </span>
                           )}
                           {portfolio.project_url && (

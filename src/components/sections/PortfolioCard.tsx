@@ -74,17 +74,25 @@ export function PortfolioCard({
           )}
         >
           <div className="bg-background/70 backdrop-blur-md rounded-xl p-3 border border-border/40">
-            {/* Category Badge */}
-            <span
-              className={cn(
-                "inline-block px-2.5 py-1 rounded-full text-xs font-medium mb-2 transition-colors",
-                isSelected
-                  ? "bg-accent text-white"
-                  : "bg-accent/20 text-accent"
-              )}
-            >
-              {portfolio.category}
-            </span>
+            {/* Type Badges */}
+            <div className="flex flex-wrap gap-1 mb-2">
+              {(portfolio.category || "")
+                .split(", ")
+                .filter(Boolean)
+                .map((type) => (
+                  <span
+                    key={type}
+                    className={cn(
+                      "inline-block px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
+                      isSelected
+                        ? "bg-accent text-white"
+                        : "bg-accent/20 text-accent"
+                    )}
+                  >
+                    {type.trim()}
+                  </span>
+                ))}
+            </div>
 
             {/* Title */}
             <h3
@@ -124,17 +132,25 @@ export function PortfolioCard({
           isSelected ? "opacity-0" : "group-hover:opacity-0"
         )}
       >
-        {/* Category Badge */}
-        <span
-          className={cn(
-            "inline-block px-2.5 py-1 rounded-full text-xs font-medium mb-2",
-            isSelected
-              ? "bg-accent text-white"
-              : "bg-accent/20 text-accent"
-          )}
-        >
-          {portfolio.category}
-        </span>
+        {/* Type Badges */}
+        <div className="flex flex-wrap gap-1 mb-2">
+          {(portfolio.category || "")
+            .split(", ")
+            .filter(Boolean)
+            .map((type) => (
+              <span
+                key={type}
+                className={cn(
+                  "inline-block px-2.5 py-1 rounded-full text-xs font-medium",
+                  isSelected
+                    ? "bg-accent text-white"
+                    : "bg-accent/20 text-accent"
+                )}
+              >
+                {type.trim()}
+              </span>
+            ))}
+        </div>
 
         {/* Title */}
         <h3

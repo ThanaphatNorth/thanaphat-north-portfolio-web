@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { PortfolioCard } from "./PortfolioCard";
 import { PortfolioDetail } from "./PortfolioDetail";
 import type { PortfolioItem } from "@/lib/supabase-server";
@@ -16,6 +17,42 @@ export function PortfolioShowcase({
 }: PortfolioShowcaseProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  // Extract unique categories (types) from portfolios, handling comma-separated values
+  const types = useMemo(() => {
+    const allTypes = portfolios.flatMap((p) =>
+      p.category
+        ? p.category
+            .split(", ")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : []
+    );
+    return [...new Set(allTypes)].sort();
+  }, [portfolios]);
+
+  // Filter portfolios based on selected types (supports comma-separated categories)
+  const filteredPortfolios = useMemo(() => {
+    if (selectedTypes.length === 0) return portfolios;
+    return portfolios.filter((p) => {
+      const portfolioTypes = p.category
+        ? p.category
+            .split(", ")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+      return portfolioTypes.some((t) => selectedTypes.includes(t));
+    });
+  }, [portfolios, selectedTypes]);
+
+  const toggleType = (type: string) => {
+    setSelectedTypes((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type]
+    );
+  };
 
   const selectedPortfolio = selectedId
     ? portfolios.find((p) => p.id === selectedId)
@@ -63,6 +100,43 @@ export function PortfolioShowcase({
 
   return (
     <>
+      {/* Type Filter - Multi Select */}
+      {types.length > 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-wrap items-center gap-2 mb-6"
+        >
+          <button
+            onClick={() => setSelectedTypes([])}
+            className={cn(
+              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border",
+              selectedTypes.length === 0
+                ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
+                : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
+            )}
+          >
+            All
+          </button>
+          {types.map((type) => (
+            <button
+              key={type}
+              onClick={() => toggleType(type)}
+              className={cn(
+                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border",
+                selectedTypes.includes(type)
+                  ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
+                  : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
+              )}
+            >
+              {type}
+            </button>
+          ))}
+        </motion.div>
+      )}
+
       {/* Portfolio Cards Grid - Full Width */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -71,16 +145,35 @@ export function PortfolioShowcase({
         transition={{ duration: 0.5 }}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {portfolios.map((portfolio, index) => (
-            <PortfolioCard
-              key={portfolio.id}
-              portfolio={portfolio}
-              isSelected={portfolio.id === selectedId}
-              onClick={() => handleCardClick(portfolio.id)}
-              index={index}
-            />
-          ))}
+          <AnimatePresence mode="popLayout">
+            {filteredPortfolios.map((portfolio, index) => (
+              <motion.div
+                key={portfolio.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+              >
+                <PortfolioCard
+                  portfolio={portfolio}
+                  isSelected={portfolio.id === selectedId}
+                  onClick={() => handleCardClick(portfolio.id)}
+                  index={index}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
+
+        {/* Empty state when no portfolios match filter */}
+        {filteredPortfolios.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted text-sm">
+              No projects found for the selected types.
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* Slide-in Drawer from Right */}

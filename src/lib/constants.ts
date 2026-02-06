@@ -248,3 +248,45 @@ export const techStack = {
     { name: "Redis", icon: "redis" },
   ],
 };
+
+/**
+ * Portfolio type options used in admin forms and filtering
+ */
+export const portfolioTypeOptions = [
+  "Web App",
+  "Mobile",
+  "Design",
+  "E-commerce",
+  "SaaS",
+  "API",
+  "Dashboard",
+  "Library",
+  "Training",
+  "Consulting",
+  "Research",
+  "Education",
+  "Other",
+] as const;
+
+/**
+ * Portfolio skill options used in admin forms for quick selection
+ */
+export const portfolioSkillOptions = [
+  "AI",
+  "ML",
+  "Data Science",
+  "DevOps",
+  "Cloud",
+  "Security",
+  "Blockchain",
+  "IoT",
+  "AR/VR",
+  "Integration",
+  "Automation",
+  "Management",
+  "Agile",
+  "Scrum",
+  "Architecture Design",
+  "System Design",
+  "Code Review",
+] as const;
