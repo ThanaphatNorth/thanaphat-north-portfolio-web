@@ -1,8 +1,22 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
-import { Building2, Calendar, CheckCircle2, Download } from "lucide-react";
-import { SectionWrapper, SectionHeader } from "@/components/ui/SectionWrapper";
+import {
+  motion,
+  Variants,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { useRef } from "react";
+import {
+  Building2,
+  Calendar,
+  CheckCircle2,
+  Download,
+} from "lucide-react";
+import {
+  SectionWrapper,
+  SectionHeader,
+} from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
 import { experiences, siteConfig } from "@/lib/constants";
 
@@ -28,18 +42,22 @@ const itemVariants: Variants = {
   },
 };
 
-const lineVariants: Variants = {
-  hidden: { scaleY: 0 },
-  visible: {
-    scaleY: 1,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut" as const,
-    },
-  },
-};
-
 export function ExperienceTimeline() {
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  // Track scroll progress of the timeline section
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start center", "end center"],
+  });
+
+  // Transform scroll progress to line height (0 to 100%)
+  const lineHeight = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", "100%"]
+  );
+
   return (
     <SectionWrapper id="experience">
       <SectionHeader
@@ -48,17 +66,26 @@ export function ExperienceTimeline() {
       />
 
       <motion.div
+        ref={timelineRef}
         variants={timelineVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         className="relative max-w-4xl mx-auto"
       >
-        {/* Timeline Line */}
-        <motion.div
-          variants={lineVariants}
-          className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-accent via-accent/50 to-transparent origin-top"
+        {/* Timeline Line Background (static) */}
+        <div
+          className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-border origin-top"
           style={{ transform: "translateX(-50%)" }}
+        />
+
+        {/* Timeline Line Progress (animated with scroll) */}
+        <motion.div
+          className="absolute left-0 md:left-1/2 top-0 w-px bg-gradient-to-b from-accent via-accent/80 to-accent origin-top"
+          style={{
+            transform: "translateX(-50%)",
+            height: lineHeight,
+          }}
         />
 
         {experiences.map((experience, index) => {
@@ -119,19 +146,23 @@ export function ExperienceTimeline() {
 
                   {/* Highlights */}
                   <ul className="space-y-2">
-                    {experience.highlights.map((highlight, hIndex) => (
-                      <motion.li
-                        key={hIndex}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 * hIndex }}
-                        className="flex items-start gap-2 text-sm"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                        <span className="text-foreground/80">{highlight}</span>
-                      </motion.li>
-                    ))}
+                    {experience.highlights.map(
+                      (highlight, hIndex) => (
+                        <motion.li
+                          key={hIndex}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.1 * hIndex }}
+                          className="flex items-start gap-2 text-sm"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                          <span className="text-foreground/80">
+                            {highlight}
+                          </span>
+                        </motion.li>
+                      )
+                    )}
                   </ul>
                 </motion.div>
               </div>
@@ -154,7 +185,10 @@ export function ExperienceTimeline() {
         <p className="text-muted mb-4">
           Want to see more details about my experience?
         </p>
-        <a href={siteConfig.resumeUrl} download="Thanaphat-Chirutpadathorn-Resume.pdf">
+        <a
+          href={siteConfig.resumeUrl}
+          download="Thanaphat-Chirutpadathorn-Resume.pdf"
+        >
           <Button
             variant="primary"
             size="lg"
