@@ -6,9 +6,9 @@ const defaultExperience = getDefaultExperienceYears();
 export const siteConfig = {
   name: "Thanaphat (North)",
   title:
-    "Thanaphat Chirutpadathorn (North) | Engineering Manager & Tech Entrepreneur",
+    "Thanaphat Chirutpadathorn (North) | Technical Consultant, Engineering Manager & Tech Entrepreneur",
   nameThai: "ฐานพัฒน์ จิรุตม์ผะดาทร",
-  description: `Engineering Manager with ${defaultExperience.totalYearsDisplay} years of software development experience and ${defaultExperience.leadershipYearsDisplay} years in leadership roles. Specialized in scaling high-performing teams and building robust systems.`,
+  description: `Technical Consultant & Engineering Manager with ${defaultExperience.totalYearsDisplay}+ years in software development, web & mobile app architecture. Founder of JongQue.com (ระบบจองคิวออนไลน์). ${defaultExperience.leadershipYearsDisplay}+ years leading engineering teams. Specializing in scalable systems, Agile transformation, and end-to-end technical advisory.`,
   url: "https://thanaphat-north.com",
   ogImage: "/opengraph-image",
   resumeUrl: "/Thanaphat-Chirutpadathorn-Resume.pdf",

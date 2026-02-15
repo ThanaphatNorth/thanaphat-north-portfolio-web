@@ -56,17 +56,106 @@ export const metadata: Metadata = {
     "พัฒนาซอฟต์แวร์",
     "นักพัฒนาซอฟต์แวร์",
     "โปรแกรมเมอร์",
-    // Freelance
+    // Technical Consultant
+    "Technical Consultant",
+    "Technical Consultant Thailand",
+    "Software Technical Consultant",
+    "IT Consultant",
+    "IT Consultant Thailand",
+    "Technology Consultant",
+    "Software Consulting",
+    "Technical Advisory",
+    "Technical Advisor",
+    "Startup Technical Advisor",
+    "ที่ปรึกษาด้านเทคนิค",
+    "ที่ปรึกษาซอฟต์แวร์",
+    "ที่ปรึกษา IT",
+    "Hire Technical Consultant",
+    "Hire Technical Consultant Thailand",
+    // Freelance (still indexed but secondary)
     "Freelance",
     "Freelance Developer",
     "Freelance Software Developer",
+    "Freelance Software Engineer",
+    "Freelance Web Developer",
+    "Freelance Mobile Developer",
     "รับพัฒนาระบบ",
     "รับทำเว็บ",
     "รับทำแอพ",
+    "รับงาน Freelance",
+    "ฟรีแลนซ์",
+    "รับเขียนโปรแกรม",
+    // Software Development
+    "Custom Software Development",
+    "Software Development Services",
+    "Software Engineering",
+    "Application Development",
+    "Enterprise Software Development",
+    "Outsource Software Development",
+    "บริการพัฒนาซอฟต์แวร์",
+    // Web Development
+    "Web Development",
+    "Web Application Development",
+    "Website Development",
+    "Web Developer Thailand",
+    "พัฒนาเว็บ",
+    "พัฒนาเว็บไซต์",
+    "เว็บแอปพลิเคชัน",
+    "ทำเว็บไซต์",
+    // Mobile Development
+    "Mobile App Development",
+    "Mobile Application Development",
+    "Mobile Developer",
+    "React Native Developer",
+    "iOS Android Development",
+    "พัฒนาแอพมือถือ",
+    "ทำแอพ",
+    "สร้างแอปพลิเคชัน",
+    // จองคิว / JongQue.com
+    "จองคิว",
+    "ระบบจองคิว",
+    "ระบบจองคิวออนไลน์",
+    "ระบบนัดหมาย",
+    "ระบบจอง",
+    "Queue Management",
+    "Booking System",
+    "Online Booking System",
+    "Queue Management System",
+    "Appointment Scheduling",
+    "JongQue",
+    "jongque.com",
+    // Ventures & Products
+    "Tech Entrepreneur",
+    "SaaS",
+    "SaaS Platform",
+    "Startup Founder",
+    "BuildYourThinks",
+    "buildyourthinks.com",
+    "Visibr",
+    "visibr.com",
+    "Founder Matchmaking",
+    "Startup Ideas Platform",
+    // Blog & Knowledge
+    "Tech Blog",
+    "Software Engineering Blog",
+    "Engineering Leadership Blog",
+    "Technology Insights",
+    "Software Architecture Blog",
+    "บล็อกเทคโนโลยี",
+    // Portfolio
+    "Developer Portfolio",
+    "Software Engineer Portfolio",
+    "Engineering Manager Portfolio",
+    "Tech Portfolio",
+    "Project Portfolio",
+    "ผลงาน",
+    "พอร์ตโฟลิโอ",
     // Agile & methodology
     "Agile",
     "Scrum",
     "Agile Coach",
+    "Agile Consultant",
+    "DevOps",
     // Technologies
     "Software",
     "React",
@@ -74,9 +163,14 @@ export const metadata: Metadata = {
     "Node.js",
     "AWS",
     "TypeScript",
+    "NestJS",
+    "Docker",
+    "Kubernetes",
     // Other
     "Team Leadership",
     "Startup Advisor",
+    "CTO as a Service",
+    "Fractional CTO",
     "Thailand",
   ],
   authors: [{ name: siteConfig.name }],
@@ -123,32 +217,74 @@ const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Thanaphat Chirutpadathorn (North)",
-  alternateName: ["ฐานพัฒน์ จิรุตม์ผะดาทร", "Thanaphat North", "North"],
+  alternateName: [
+    "ฐานพัฒน์ จิรุตม์ผะดาทร",
+    "Thanaphat North",
+    "North",
+  ],
   url: siteConfig.url,
   image: `${siteConfig.url}${siteConfig.ogImage}`,
-  jobTitle: ["Engineering Manager", "Software Developer", "Freelance Developer"],
+  jobTitle: [
+    "Technical Consultant",
+    "Engineering Manager",
+    "Software Architect",
+    "Tech Entrepreneur",
+  ],
   worksFor: {
     "@type": "Organization",
     name: "Invitrace",
   },
   description: siteConfig.description,
-  sameAs: [siteConfig.links.linkedin, siteConfig.links.github],
+  sameAs: [
+    siteConfig.links.linkedin,
+    siteConfig.links.github,
+    "https://jongque.com",
+    "https://buildyourthinks.com",
+    "https://visibr.com",
+  ],
   knowsAbout: [
     "Software Engineering",
     "Software Development",
+    "Custom Software Development",
+    "Web Development",
+    "Web Application Development",
+    "Mobile App Development",
+    "React Native Development",
     "พัฒนาระบบ",
     "พัฒนา Software",
+    "พัฒนาเว็บ",
+    "พัฒนาแอพมือถือ",
+    "จองคิว",
+    "ระบบจองคิวออนไลน์",
+    "Queue Management System",
+    "Booking System",
     "Team Leadership",
     "Agile Methodologies",
     "Agile",
     "Scrum",
+    "DevOps",
     "Cloud Architecture",
     "React",
+    "Next.js",
     "Node.js",
+    "NestJS",
     "AWS",
-    "Freelance Development",
+    "Docker",
+    "Kubernetes",
+    "Technical Consulting",
+    "Software Consulting",
+    "IT Advisory",
+    "SaaS Development",
+    "Tech Entrepreneurship",
+    "Scalable Architecture Design",
+    "Digital Transformation",
   ],
   hasOccupation: [
+    {
+      "@type": "Occupation",
+      name: "Technical Consultant",
+      occupationalCategory: "15-1299.08",
+    },
     {
       "@type": "Occupation",
       name: "Engineering Manager",
@@ -156,19 +292,20 @@ const personJsonLd = {
     },
     {
       "@type": "Occupation",
-      name: "Software Developer",
+      name: "Software Architect",
       occupationalCategory: "15-1252.00",
     },
   ],
 };
 
-// JSON-LD for Freelance Service
+// JSON-LD for Technical Consulting Service
 const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
-  name: "Thanaphat North - Freelance Software Development",
-  alternateName: "ฐานพัฒน์ - รับพัฒนาระบบ Freelance",
-  description: "Freelance Software Development Services - พัฒนาระบบ, พัฒนา Software, Web & Mobile Applications",
+  name: "Thanaphat North - Technical Consultant & Software Development",
+  alternateName: "ฐานพัฒน์ - ที่ปรึกษาด้านเทคนิค & พัฒนาระบบ",
+  description:
+    "Technical Consulting & Software Development Services - ที่ปรึกษาซอฟต์แวร์, พัฒนาระบบ, Architecture Design, Web & Mobile Applications, ระบบจองคิว (jongque.com), Agile Transformation, SaaS Platform Development",
   url: siteConfig.url,
   provider: {
     "@type": "Person",
@@ -180,14 +317,100 @@ const serviceJsonLd = {
     name: "Thailand",
   },
   serviceType: [
-    "Software Development",
-    "Web Development",
-    "Mobile App Development",
-    "Agile Consulting",
+    "Technical Consulting",
+    "Software Consulting",
+    "IT Consulting",
     "Technical Advisory",
+    "Startup Technical Consulting",
+    "Architecture Design",
+    "Agile Transformation",
+    "CTO as a Service",
+    "Software Development",
+    "Custom Software Development",
+    "Web Development",
+    "Web Application Development",
+    "Mobile App Development",
+    "React Native Development",
+    "Queue Management System",
+    "Booking System Development",
+    "SaaS Development",
+    "ที่ปรึกษาด้านเทคนิค",
+    "ที่ปรึกษาซอฟต์แวร์",
     "พัฒนาระบบ",
     "พัฒนา Software",
+    "พัฒนาเว็บ",
+    "พัฒนาแอพมือถือ",
+    "ระบบจองคิว",
+    "ระบบจองคิวออนไลน์",
+    "รับพัฒนาระบบ",
+    "รับทำเว็บ",
+    "รับทำแอพ",
   ],
+};
+
+// JSON-LD for Ventures (SaaS Products)
+const venturesJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Thanaphat North - Tech Ventures & Products",
+  description: "SaaS products and tech ventures by Thanaphat North",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      item: {
+        "@type": "SoftwareApplication",
+        name: "JongQue.com",
+        alternateName: "จองคิว",
+        url: "https://jongque.com",
+        applicationCategory: "BusinessApplication",
+        description:
+          "ระบบจองคิวออนไลน์ - SaaS platform for resource & queue management, online booking system, appointment scheduling",
+        offers: { "@type": "Offer", availability: "https://schema.org/InStock" },
+      },
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      item: {
+        "@type": "WebSite",
+        name: "BuildYourThinks.com",
+        url: "https://buildyourthinks.com",
+        description:
+          "Startup ideas & founder matchmaking platform - connecting aspiring founders with ideas and co-founders",
+      },
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      item: {
+        "@type": "Blog",
+        name: "Visibr.com",
+        url: "https://visibr.com",
+        description:
+          "Tech blog sharing insights on software architecture, engineering leadership, and technology trends",
+      },
+    },
+  ],
+};
+
+// JSON-LD for Portfolio Website
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Thanaphat North - Portfolio & Blog",
+  alternateName: "ฐานพัฒน์ - พอร์ตโฟลิโอ",
+  url: siteConfig.url,
+  description: siteConfig.description,
+  author: {
+    "@type": "Person",
+    name: "Thanaphat Chirutpadathorn",
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteConfig.url}/blog?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default function RootLayout({
@@ -200,11 +423,27 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personJsonLd),
+          }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(serviceJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(venturesJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd),
+          }}
         />
       </head>
       <body
