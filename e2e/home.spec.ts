@@ -55,6 +55,8 @@ test.describe("home — desktop", () => {
 
   test("service CTA pre-selects that service every time (was stale after first open)", async ({ page }) => {
     await page.goto("/");
+    // Cards re-render once when the motion tier resolves after hydration.
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "full");
     await page.getByTestId("service-cta-advisor").scrollIntoViewIfNeeded();
     await page.getByTestId("service-cta-advisor").click();
     await expect(page.locator("#contact-service")).toHaveValue("Startup & Product Technical Advisor");
@@ -180,7 +182,7 @@ test("hero shows the access badge with the real portrait", async ({ page }) => {
   await expect(badge.getByRole("img", { name: "Thanaphat (North)" })).toBeVisible();
 });
 
-test("intro plays once per session, never blocks clicks; portrait + WebGL hover present", async ({ page }) => {
+test("intro plays once per session, never blocks clicks; WebGL hover present", async ({ page }) => {
   await page.goto("/");
   const intro = page.getByTestId("intro");
   await expect(intro).toBeVisible();
@@ -188,7 +190,7 @@ test("intro plays once per session, never blocks clicks; portrait + WebGL hover 
   await expect(intro).toBeHidden({ timeout: 4000 });
   await page.reload();
   await expect(intro).toBeHidden();
-  await expect(page.getByTestId("hero-portrait").locator("img")).toBeVisible();
+  await expect(page.getByTestId("hero-portrait")).toHaveCount(0);
   // WebGL layer is created lazily on first hover of a project card
   await page.evaluate(() => {
     const g = document.querySelector("[data-testid=portfolio-gallery]")!;
