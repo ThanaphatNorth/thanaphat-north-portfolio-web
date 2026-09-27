@@ -19,6 +19,7 @@ npm run dev
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | content (portfolio, ventures, blog, settings) |
 | `RESEND_API_KEY` | prod | contact-form email; without it contacts are saved but no email is sent |
+| `DISCORD_CONTACT_WEBHOOK_URL` | optional | Discord incoming webhook; every contact submission is posted to that channel (secret — set in Vercel, never commit) |
 | `ADMIN_EMAILS` | recommended | comma-separated admin allow-list for `/admin` (falls back to `ADMIN_EMAIL`, then the owner's address) |
 
 ## Database

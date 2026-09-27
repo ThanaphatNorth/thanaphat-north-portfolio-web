@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "e2e": "playwright test --project=desktop --project=mobile --project=reduced-motion",
+    "e2e": "playwright test --project=unit --project=desktop --project=mobile --project=reduced-motion",
     "e2e:video": "playwright test --project=showcase"
   },
   "dependencies": {

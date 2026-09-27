@@ -5,6 +5,9 @@ const MOCK_PORT = 54329;
 const env = {
   NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${MOCK_PORT}`,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "e2e-anon-key",
+  // Contact notifications go to the mock's fake Discord webhook, never the real one.
+  DISCORD_CONTACT_WEBHOOK_URL: `http://127.0.0.1:${MOCK_PORT}/api/webhooks/1/e2e-token`,
+  DISCORD_WEBHOOK_ALLOW_LOCAL: "1",
 };
 
 export default defineConfig({
@@ -21,6 +24,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
+    { name: "unit", testMatch: /\.unit\.spec\.ts/ },
     { name: "desktop", testMatch: /home\.spec\.ts/, use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
     { name: "mobile", testMatch: /mobile\.spec\.ts/, use: { ...devices["Pixel 7"] } },
     { name: "reduced-motion", testMatch: /reduced-motion\.spec\.ts/, use: { ...devices["Desktop Chrome"], reducedMotion: "reduce" } },

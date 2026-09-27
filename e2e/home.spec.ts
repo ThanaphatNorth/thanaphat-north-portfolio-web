@@ -122,3 +122,29 @@ test("pause-motion (manual, no OS setting) also stops CSS transitions and Lenis"
   // restore for the next tests
   await page.getByTestId("motion-toggle").first().click();
 });
+
+test("contact submission is forwarded to the Discord webhook without pinging anyone", async ({ page, request }) => {
+  const before = (await (await request.get("http://127.0.0.1:54329/__discord")).json()).length;
+  await page.goto("/");
+  await page.getByTestId("hero-cta").click();
+  await page.locator("#contact-name").fill("Discord Tester");
+  await page.locator("#contact-email").fill("discord@example.com");
+  await page.locator("#contact-service").selectOption("Tech Leadership Coaching");
+  await page.locator("#contact-message").fill("Hi @everyone — please call me back.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByRole("status")).toContainText("got it");
+
+  const inbox = await (await request.get("http://127.0.0.1:54329/__discord")).json();
+  expect(inbox.length).toBe(before + 1);
+  const payload = inbox[inbox.length - 1];
+  expect(payload.allowed_mentions).toEqual({ parse: [] });
+  const embed = payload.embeds[0];
+  expect(embed.title).toContain("Tech Leadership Coaching");
+  expect(embed.description).not.toContain("@everyone");
+  expect(embed.fields).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ name: "Name", value: "Discord Tester" }),
+      expect.objectContaining({ name: "Email", value: "discord@example.com" }),
+    ])
+  );
+});

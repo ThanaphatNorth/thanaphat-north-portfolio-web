@@ -69,97 +69,114 @@ export const credentials = [
   "B.Sc. Media Technology · KMUTT",
 ];
 
-export const experiences = [
+/**
+ * Career grouped by company (newest first). Roles inside a company are
+ * promotions, newest first — rendered as one waypoint with a role ladder.
+ */
+export const experienceGroups = [
   {
     company: "Invitrace",
-    role: "Senior Engineering Manager",
-    period: "Jul 2026 – Present",
-    year: "2026",
-    description:
-      "Leading the engineering organization end-to-end: 30+ cross-functional engineers delivering secure healthcare technology — patient-facing apps, employee-health products and hospital back-office systems under one delivery org.",
-    highlights: [
-      "Own hiring strategy, performance management and technical direction",
-      "Brought the hospital internal-systems team into a single delivery organization",
-      "Matured the AI-assisted workflow to a 3× gain in deployment frequency & cycle time",
-      "Completed the org-wide shift to a flow-based (Kanban) operating model",
-    ],
-  },
-  {
-    company: "Invitrace",
-    role: "Engineering Manager / Delivery Lead",
-    period: "Aug 2025 – Jun 2026",
-    year: "2025",
-    description:
-      "Managed delivery across all product teams — a patient-facing hospital app and an employee health & wellness app — owning hiring, onboarding and performance reviews.",
-    highlights: [
-      "Scaled AI developer tooling from a single-team pilot to the whole organization",
-      "Designed structured QA (test planning, regression coverage) to stabilize releases",
-      "Ran delivery hands-on in Jira: backlog, boards and stakeholder reporting",
-      "Introduced Kanban governance, knowledge-sharing sessions and regular 1:1s",
-    ],
-  },
-  {
-    company: "Invitrace",
-    role: "Tech Lead",
-    period: "Sep 2024 – Jul 2025",
-    year: "2024",
-    description:
-      "Led a cross-functional squad shipping 7+ products around the employee health & wellness app, aligning technical strategy with business priorities.",
-    highlights: [
-      "Grew team capacity 50% — 18 engineers recruited & onboarded in 3 months",
-      "Piloted AI developer tools with responsible-usage training (~30% productivity)",
-      "Drove ISO 27001/9001 certification through security & process standardization",
-      "~25% fewer production defects; 40% less design time via reusable templates",
+    tagline: "Healthcare technology · Bangkok",
+    period: "Sep 2024 – Present",
+    from: "2024",
+    to: "Now",
+    roles: [
+      {
+        title: "Senior Engineering Manager",
+        period: "Jul 2026 – Present",
+        description:
+          "Leading the engineering organization end-to-end: 30+ cross-functional engineers delivering secure healthcare technology — patient-facing apps, employee-health products and hospital back-office systems under one delivery org.",
+        highlights: [
+          "Own hiring strategy, performance management and technical direction",
+          "Brought the hospital internal-systems team into a single delivery organization",
+          "Matured the AI-assisted workflow to a 3× gain in deployment frequency & cycle time",
+          "Completed the org-wide shift to a flow-based (Kanban) operating model",
+        ],
+      },
+      {
+        title: "Engineering Manager / Delivery Lead",
+        period: "Aug 2025 – Jun 2026",
+        description:
+          "Managed delivery across all product teams — a patient-facing hospital app and an employee health & wellness app — owning hiring, onboarding and performance reviews.",
+        highlights: [
+          "Scaled AI developer tooling from a single-team pilot to the whole organization",
+          "Designed structured QA (test planning, regression coverage) to stabilize releases",
+          "Ran delivery hands-on in Jira: backlog, boards and stakeholder reporting",
+          "Introduced Kanban governance, knowledge-sharing sessions and regular 1:1s",
+        ],
+      },
+      {
+        title: "Tech Lead",
+        period: "Sep 2024 – Jul 2025",
+        description:
+          "Led a cross-functional squad shipping 7+ products around the employee health & wellness app, aligning technical strategy with business priorities.",
+        highlights: [
+          "Grew team capacity 50% — 18 engineers recruited & onboarded in 3 months",
+          "Piloted AI developer tools with responsible-usage training (~30% productivity)",
+          "Drove ISO 27001/9001 certification through security & process standardization",
+          "~25% fewer production defects; 40% less design time via reusable templates",
+        ],
+      },
     ],
   },
   {
     company: "iPassion",
-    role: "Tech Lead & Team Lead",
-    period: "Jun 2023 – Aug 2024",
-    year: "2023",
-    description:
-      "Led a 30-member team integrating 10 legacy systems into one unified platform for an enterprise automotive manufacturer.",
-    highlights: [
-      "Unified 10 legacy systems, streamlining data flow and removing silos",
-      "Raised delivery speed and predictability with agile practices",
-      "Ran proactive risk monitoring and mitigation for consistent delivery",
-    ],
-  },
-  {
-    company: "iPassion",
-    role: "Technical Lead & Solution Consultant (Pre-Sales)",
-    period: "Jul 2020 – May 2023",
-    year: "2020",
-    description:
-      "Modeled business processes, designed databases and solutions, advised low-code teams and partnered with sales on proposals for automotive and finance clients.",
-    highlights: [
-      "~20% less manual work through process automation",
-      "LINE Bot for support-issue triage — ~30% faster assignment",
-      "~20% less post-sale rework through tailored proposals & demos",
-    ],
-  },
-  {
-    company: "iPassion",
-    role: "Software Developer",
-    period: "Jul 2018 – Jun 2020",
-    year: "2018",
-    description:
-      "Built front-end apps (Angular, React) and cross-platform mobile apps (Ionic, React Native) with a 95%+ crash-free rate.",
-    highlights: [
-      "95%+ crash-free mobile releases",
-      "API integrations that cut user-facing errors by ~20%",
+    tagline: "Enterprise software & low-code consulting",
+    period: "Jul 2018 – Aug 2024",
+    from: "2018",
+    to: "2024",
+    roles: [
+      {
+        title: "Tech Lead & Team Lead",
+        period: "Jun 2023 – Aug 2024",
+        description:
+          "Led a 30-member team integrating 10 legacy systems into one unified platform for an enterprise automotive manufacturer.",
+        highlights: [
+          "Unified 10 legacy systems, streamlining data flow and removing silos",
+          "Raised delivery speed and predictability with agile practices",
+          "Ran proactive risk monitoring and mitigation for consistent delivery",
+        ],
+      },
+      {
+        title: "Technical Lead & Solution Consultant (Pre-Sales)",
+        period: "Jul 2020 – May 2023",
+        description:
+          "Modeled business processes, designed databases and solutions, advised low-code teams and partnered with sales on proposals for automotive and finance clients.",
+        highlights: [
+          "~20% less manual work through process automation",
+          "LINE Bot for support-issue triage — ~30% faster assignment",
+          "~20% less post-sale rework through tailored proposals & demos",
+        ],
+      },
+      {
+        title: "Software Developer",
+        period: "Jul 2018 – Jun 2020",
+        description:
+          "Built front-end apps (Angular, React) and cross-platform mobile apps (Ionic, React Native) with a 95%+ crash-free rate.",
+        highlights: [
+          "95%+ crash-free mobile releases",
+          "API integrations that cut user-facing errors by ~20%",
+        ],
+      },
     ],
   },
   {
     company: "Codediva",
-    role: "Software Developer",
+    tagline: "Mobile & POS software",
     period: "Jun 2017 – Jul 2018",
-    year: "2017",
-    description:
-      "Delivered Android apps end-to-end, ran UAT with client users, and built Java libraries for POS transaction processing.",
-    highlights: [
-      "End-to-end Android delivery, from development to handover",
-      "Independent UAT with client users before every release",
+    from: "2017",
+    to: "2018",
+    roles: [
+      {
+        title: "Software Developer",
+        period: "Jun 2017 – Jul 2018",
+        description:
+          "Delivered Android apps end-to-end, ran UAT with client users, and built Java libraries for POS transaction processing.",
+        highlights: [
+          "End-to-end Android delivery, from development to handover",
+          "Independent UAT with client users before every release",
+        ],
+      },
     ],
   },
 ];

@@ -19,6 +19,8 @@ const tables = {
   contacts: [],
 };
 
+const discordInbox = [];
+
 const PORT = Number(process.env.MOCK_SUPABASE_PORT || 54329);
 
 function applyFilters(rows, params) {
@@ -59,6 +61,19 @@ http
       return res.end();
     }
     if (url.pathname.startsWith("/auth/v1/")) return send(401, { message: "no session (mock)" });
+
+    // Fake Discord incoming webhook: records payloads; GET /__discord lists them.
+    if (url.pathname === "/__discord") return send(200, discordInbox);
+    if (req.method === "POST" && /^\/api\/webhooks\/\d+\/[\w-]+$/.test(url.pathname)) {
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        discordInbox.push(JSON.parse(body || "{}"));
+        res.writeHead(204);
+        res.end();
+      });
+      return;
+    }
 
     const m = url.pathname.match(/^\/rest\/v1\/([a-z_]+)$/);
     if (!m || !tables[m[1]]) return send(404, { message: "not found (mock)" });

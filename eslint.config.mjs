@@ -7,6 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
+    "e2e/.report/**",
+    "e2e/.results/**",
+    "test-results/**",
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
