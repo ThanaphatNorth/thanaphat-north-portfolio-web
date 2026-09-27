@@ -15,6 +15,8 @@ import { ArrowDownRight, Sparkles } from "lucide-react";
 import { useLenis } from "lenis/react";
 import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/fx/Magnetic";
+import { TiltCard } from "@/components/fx/TiltCard";
+import { useTerminal } from "@/components/terminal/TerminalProvider";
 import { FrameSequence } from "@/components/fx/FrameSequence";
 import { AmbientVideo } from "@/components/fx/AmbientVideo";
 import { CodeMosaic } from "@/components/fx/CodeMosaic";
@@ -57,6 +59,7 @@ export function Hero({ experience }: HeroProps) {
   const tier = useMotionTier();
   const lenis = useLenis();
   const { openContact } = useContact();
+  const { openTerminal } = useTerminal();
   const sectionRef = useRef<HTMLElement>(null);
   const [built, setBuilt] = useState(false);
 
@@ -216,6 +219,39 @@ export function Hero({ experience }: HeroProps) {
           <span className="label-mono hidden sm:inline">{coordinates}</span>
         </div>
 
+        {/* Access badge — the person behind the systems (desktop) */}
+        <motion.div
+          className="absolute right-6 2xl:right-[6vw] top-[24svh] hidden xl:block"
+          style={{ x: nearL.x, y: nearL.y, opacity: p ? copyOpacity : 1 }}
+          data-testid="hero-badge"
+        >
+          <TiltCard className="rounded-2xl" max={10}>
+            <div className="w-72 rounded-2xl glass border border-border/70 p-4 shadow-2xl shadow-ink/60">
+              <div className="flex items-center justify-between mb-3">
+                <span className="label-mono !text-accent">Access · production</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-dot" aria-hidden="true" />
+              </div>
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- tiny local asset, alpha-cut */}
+                <img src="/media/portrait.webp" alt="Thanaphat (North)" width={64} height={64} className="w-16 h-16 rounded-full ring-2 ring-accent/70 object-cover" />
+                <div>
+                  <p className="font-display text-lg font-semibold leading-tight text-paper">Thanaphat C.</p>
+                  <p className="text-xs text-muted">Senior Engineering Manager</p>
+                </div>
+              </div>
+              <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-[11px]">
+                <dt className="text-muted">ID</dt>
+                <dd className="text-paper/85">NORTH-2017</dd>
+                <dt className="text-muted">Team</dt>
+                <dd className="text-paper/85">30+ engineers</dd>
+                <dt className="text-muted">Clearance</dt>
+                <dd className="text-paper/85">ISO 27001 / 9001</dd>
+              </dl>
+              <div className="mt-4 h-6 rounded bg-[repeating-linear-gradient(90deg,var(--paper)_0_2px,transparent_2px_4px,var(--paper)_4px_5px,transparent_5px_8px)] opacity-25" aria-hidden="true" />
+            </div>
+          </TiltCard>
+        </motion.div>
+
         {/* Copy — visible at first paint (no opacity:0 on the LCP text) */}
         <motion.div
           className="absolute inset-x-0 bottom-0 max-w-7xl mx-auto px-4 md:px-6 pb-14 md:pb-20"
@@ -232,6 +268,8 @@ export function Hero({ experience }: HeroProps) {
               <span className="font-serif-accent text-accent">ship.</span>
             </h1>
             <p className="mt-5 text-base md:text-lg text-paper/75 max-w-xl leading-relaxed">
+              {/* eslint-disable-next-line @next/next/no-img-element -- tiny local asset */}
+              <img src="/media/portrait.webp" alt="" width={28} height={28} className="xl:hidden inline-block w-7 h-7 rounded-full ring-1 ring-accent/60 align-[-0.45em] mr-2" />
               Thanaphat (North) — {experience.totalYearsDisplay} years in software,{" "}
               {experience.leadershipYearsDisplay} leading teams. I head a 30+ engineer healthcare-tech organization and
               help companies scale delivery, architecture and people.
@@ -271,12 +309,18 @@ export function Hero({ experience }: HeroProps) {
           </motion.div>
         )}
 
-        {/* Caption + terminal line (bottom-right) */}
-        <div className="absolute bottom-6 right-4 md:right-6 hidden lg:block text-right pointer-events-none" aria-hidden="true">
-          <p className="label-mono mb-2">
+        {/* Caption + terminal line (bottom-right) — opens the real terminal */}
+        <div className="absolute bottom-6 right-4 md:right-6 hidden lg:block text-right">
+          <p className="label-mono mb-2" aria-hidden="true">
             {phase === "code" ? "…and runs on code that ships." : "Every system starts as a blueprint."}
           </p>
-          <p className="font-mono text-xs text-paper/80" data-testid="hero-terminal">
+          <button
+            type="button"
+            onClick={openTerminal}
+            className="font-mono text-xs text-paper/80 hover:text-paper transition-colors"
+            aria-label="Open the terminal"
+            data-testid="hero-terminal"
+          >
             <span className="text-accent">$</span>{" "}
             {phase === "code" ? (
               <>
@@ -288,7 +332,8 @@ export function Hero({ experience }: HeroProps) {
                 {built || isStatic ? <span className="text-emerald-400">✓ live</span> : <span className="caret">▍</span>}
               </>
             )}
-          </p>
+            <span className="ml-3 text-muted">[press /]</span>
+          </button>
         </div>
 
         {/* Scroll hint */}

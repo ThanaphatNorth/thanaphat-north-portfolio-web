@@ -148,3 +148,34 @@ test("contact submission is forwarded to the Discord webhook without pinging any
     ])
   );
 });
+
+test("terminal: '/' opens it, commands run, hire opens contact, Esc closes", async ({ page }) => {
+  await page.goto("/");
+  // Wait for hydration (the provider stamps the tier on <html>) so the shortcut listener exists.
+  await expect(page.locator("html")).toHaveAttribute("data-motion", /full|lite|static/);
+  await page.keyboard.press("/");
+  const input = page.getByTestId("terminal-input");
+  await expect(input).toBeFocused();
+  await input.fill("whoami");
+  await input.press("Enter");
+  await expect(page.getByTestId("terminal-output")).toContainText("Senior Engineering Manager");
+  await input.fill("projects");
+  await input.press("Enter");
+  await expect(page.getByTestId("terminal-output")).toContainText("Booking Caddy");
+  await input.fill("hire");
+  await input.press("Enter");
+  await expect(page.getByTestId("contact-dialog").getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  // typing "/" inside a form field must not open the terminal
+  await page.getByTestId("nav-cta").click();
+  await page.locator("#contact-message").type("a/b");
+  await expect(page.locator("#contact-message")).toHaveValue("a/b");
+  await expect(page.getByTestId("terminal").getByRole("dialog")).toHaveCount(0);
+});
+
+test("hero shows the access badge with the real portrait", async ({ page }) => {
+  await page.goto("/");
+  const badge = page.getByTestId("hero-badge");
+  await expect(badge).toBeVisible();
+  await expect(badge.getByRole("img", { name: "Thanaphat (North)" })).toBeVisible();
+});

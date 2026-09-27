@@ -87,8 +87,25 @@ test("TRUE NORTH — full walkthrough (recorded)", async ({ page }) => {
   await glide(page, 1100, 260, 40);
   await glide(page, 300, 380, 50);
   await glide(page, 980, 520, 45);
+  await hoverGlide(page, page.getByTestId("hero-badge"), 40);
+  await page.waitForTimeout(900);
   await hoverGlide(page, page.getByTestId("hero-cta"));
   await page.waitForTimeout(900);
+
+  // Terminal easter egg
+  await page.getByTestId("hero-cta").focus();
+  await page.getByTestId("hero-cta").blur();
+  await page.keyboard.press("/");
+  const term = page.getByTestId("terminal-input");
+  await expect(term).toBeFocused();
+  for (const cmd of ["whoami", "experience"]) {
+    await page.keyboard.type(cmd, { delay: 70 });
+    await page.waitForTimeout(250);
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(1300);
+  }
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(500);
   await glide(page, 1000, 600, 30);
 
   // 2 — Scroll to build: blueprint → skyline → the city rewritten as code

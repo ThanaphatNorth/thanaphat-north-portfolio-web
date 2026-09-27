@@ -10,6 +10,7 @@ import { navLinks, siteConfig } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { useContact } from "@/components/contact/ContactProvider";
+import { useTerminal } from "@/components/terminal/TerminalProvider";
 import { MotionToggle } from "@/components/fx/MotionToggle";
 import { scrollToTarget } from "@/motion/scrollTo";
 
@@ -19,6 +20,7 @@ export function Navigation() {
   const { scrollY } = useScroll();
   const lenis = useLenis();
   const { openContact } = useContact();
+  const { openTerminal } = useTerminal();
 
   // MotionValue subscription: re-renders only when the boolean flips.
   useMotionValueEvent(scrollY, "change", (y) => setIsScrolled(y > 40));
@@ -83,6 +85,16 @@ export function Navigation() {
           </ul>
 
           <div className="hidden md:flex items-center gap-3">
+            <button
+              type="button"
+              onClick={openTerminal}
+              aria-label="Open terminal (press /)"
+              title="Terminal — press /"
+              data-testid="terminal-toggle"
+              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-full border border-border font-mono text-xs text-muted hover:text-accent hover:border-accent transition-colors"
+            >
+              &gt;_<kbd className="hidden lg:inline text-[10px] opacity-70">/</kbd>
+            </button>
             <MotionToggle />
             <a
               href={siteConfig.resumeUrl}

@@ -90,9 +90,12 @@ html.lenis body {
   color: var(--ink-950);
 }
 
-:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 3px;
+/* In the base layer so utilities (e.g. outline-none on the terminal input) can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+  }
 }
 
 /* ── Utilities ─────────────────────────────────────────────────────── */
