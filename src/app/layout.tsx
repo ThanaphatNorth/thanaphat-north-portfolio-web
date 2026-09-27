@@ -1,22 +1,47 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Chakra_Petch,
+  IBM_Plex_Mono,
+  IBM_Plex_Sans_Thai,
+  Instrument_Serif,
+} from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/constants";
+import { safeJsonLd } from "@/lib/security";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Display: Thai-designed (Cadson Demak) squared face — engineering feel + local identity
+const display = Chakra_Petch({
+  variable: "--font-display",
+  subsets: ["latin", "thai"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const body = IBM_Plex_Sans_Thai({
+  variable: "--font-body",
+  subsets: ["latin", "thai"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+
+const mono = IBM_Plex_Mono({
+  variable: "--font-mono-face",
   subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
+
+// Single-word editorial accent ("smarter")
+const serif = Instrument_Serif({
+  variable: "--font-serif-face",
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
   display: "swap",
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#07090d",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -225,6 +250,7 @@ const personJsonLd = {
   url: siteConfig.url,
   image: `${siteConfig.url}${siteConfig.ogImage}`,
   jobTitle: [
+    "Senior Engineering Manager",
     "Technical Consultant",
     "Engineering Manager",
     "Software Architect",
@@ -424,30 +450,30 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(personJsonLd),
+            __html: safeJsonLd(personJsonLd),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(serviceJsonLd),
+            __html: safeJsonLd(serviceJsonLd),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(venturesJsonLd),
+            __html: safeJsonLd(venturesJsonLd),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteJsonLd),
+            __html: safeJsonLd(websiteJsonLd),
           }}
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${display.variable} ${body.variable} ${mono.variable} ${serif.variable} antialiased bg-background text-foreground`}
       >
         {children}
       </body>

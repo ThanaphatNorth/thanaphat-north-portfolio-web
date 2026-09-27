@@ -15,7 +15,7 @@ import {
   Users,
   Trophy,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, parseCategories } from "@/lib/utils";
 import type { PortfolioItem } from "@/lib/supabase-server";
 
 interface PortfolioDetailProps {
@@ -120,10 +120,7 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {(portfolio.category || "")
-                .split(", ")
-                .filter(Boolean)
-                .map((type) => (
+              {parseCategories(portfolio.category).map((type) => (
                   <span
                     key={type}
                     className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20"
@@ -306,7 +303,7 @@ export function PortfolioDetail({ portfolio }: PortfolioDetailProps) {
               href={portfolio.project_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-ink font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             >
               <ExternalLink size={16} aria-hidden="true" />
               View Project

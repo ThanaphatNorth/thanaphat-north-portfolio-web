@@ -1,218 +1,145 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { Download, Menu } from "lucide-react";
+import { useLenis } from "lenis/react";
 import { cn } from "@/lib/utils";
 import { navLinks, siteConfig } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { useContact } from "@/components/contact/ContactProvider";
+import { MotionToggle } from "@/components/fx/MotionToggle";
+import { scrollToTarget } from "@/motion/scrollTo";
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const lenis = useLenis();
+  const { openContact } = useContact();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+  // MotionValue subscription: re-renders only when the boolean flips.
+  useMotionValueEvent(scrollY, "change", (y) => setIsScrolled(y > 40));
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isMobileMenuOpen]);
-
-  const handleNavClick = (href: string) => {
-    setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const go = (href: string) => {
+    setMenuOpen(false);
+    scrollToTarget(href, lenis);
   };
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[80] focus:px-4 focus:py-2 focus:rounded-full focus:bg-accent focus:text-ink"
+      >
+        Skip to content
+      </a>
       <motion.header
-        initial={{ y: -100 }}
+        initial={{ y: -80 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          isScrolled ? "glass border-b border-border/50" : "bg-transparent"
+          "fixed top-0 inset-x-0 z-50 transition-[background-color,border-color] duration-300 border-b",
+          isScrolled ? "glass border-border/60" : "bg-transparent border-transparent"
         )}
       >
-        <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
-          {/* Logo */}
-          <motion.a
-            href="#"
-            className="text-xl md:text-2xl font-bold text-foreground"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        <nav aria-label="Primary" className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-18 flex items-center justify-between gap-6">
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              go("#top");
+            }}
+            className="font-display text-xl md:text-2xl font-bold tracking-tight text-foreground"
+            data-testid="nav-logo"
           >
             North<span className="text-accent">.</span>
-          </motion.a>
+          </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => 
-              link.isExternal ? (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-muted hover:text-foreground transition-colors duration-300 text-sm font-medium"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <motion.a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className="text-muted hover:text-foreground transition-colors duration-300 text-sm font-medium"
-                  whileHover={{ y: -2 }}
-                >
-                  {link.label}
-                </motion.a>
-              )
-            )}
-          </div>
+          <ul className="hidden md:flex items-center gap-7">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                {link.isExternal ? (
+                  <Link href={link.href} className="nav-link text-sm text-muted hover:text-foreground transition-colors">
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      go(link.href);
+                    }}
+                    className="text-sm text-muted hover:text-foreground transition-colors"
+                    data-testid={`nav-${link.label.toLowerCase()}`}
+                  >
+                    {link.label}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:block">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => handleNavClick("#services")}
+          <div className="hidden md:flex items-center gap-3">
+            <MotionToggle />
+            <a
+              href={siteConfig.resumeUrl}
+              download="Thanaphat-Chirutpadathorn-Resume.pdf"
+              className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors px-2"
             >
-              Let&apos;s Talk
+              <Download size={15} aria-hidden="true" /> Resume
+            </a>
+            <Button size="sm" onClick={() => openContact()} data-testid="nav-cta" data-cursor="talk">
+              Let&apos;s talk
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
+          <button
+            type="button"
+            className="md:hidden p-2 -mr-2 text-foreground"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </motion.button>
+            <Menu size={24} aria-hidden="true" />
+          </button>
         </nav>
       </motion.header>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-
-            {/* Mobile Menu */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[280px] bg-card border-l border-border z-50 md:hidden"
-            >
-              <div className="flex flex-col h-full p-6">
-                {/* Close Button */}
-                <div className="flex justify-end mb-8">
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    className="p-2 text-foreground"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    aria-label="Close menu"
-                  >
-                    <X size={24} />
-                  </motion.button>
-                </div>
-
-                {/* Mobile Nav Links */}
-                <div className="flex flex-col gap-4">
-                  {navLinks.map((link, index) => 
-                    link.isExternal ? (
-                      <motion.div
-                        key={link.href}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Link
-                          href={link.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-lg text-muted hover:text-foreground transition-colors duration-300 py-2 block"
-                        >
-                          {link.label}
-                        </Link>
-                      </motion.div>
-                    ) : (
-                      <motion.a
-                        key={link.href}
-                        href={link.href}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleNavClick(link.href);
-                        }}
-                        className="text-lg text-muted hover:text-foreground transition-colors duration-300 py-2"
-                      >
-                        {link.label}
-                      </motion.a>
-                    )
-                  )}
-                </div>
-
-                {/* Mobile CTA */}
-                <div className="mt-auto">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    onClick={() => handleNavClick("#services")}
-                  >
-                    Let&apos;s Talk
-                  </Button>
-                </div>
-
-                {/* Contact Info */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <p className="text-sm text-muted mb-2">Get in touch</p>
-                  <a
-                    href={`mailto:${siteConfig.links.email}`}
-                    className="text-foreground hover:text-accent transition-colors"
-                  >
-                    {siteConfig.links.email}
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <Dialog open={menuOpen} onClose={() => setMenuOpen(false)} variant="right" title="Menu" className="sm:max-w-sm sm:w-full">
+        <div className="flex flex-col h-full p-6 gap-2">
+          {navLinks.map((link) =>
+            link.isExternal ? (
+              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="font-display text-2xl py-2 text-foreground">
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  go(link.href);
+                }}
+                className="font-display text-2xl py-2 text-foreground"
+              >
+                {link.label}
+              </a>
+            )
+          )}
+          <div className="mt-8 flex flex-col gap-3">
+            <Button size="lg" className="w-full" onClick={() => { setMenuOpen(false); openContact(); }}>
+              Let&apos;s talk
+            </Button>
+            <a href={siteConfig.resumeUrl} download className="text-center text-sm text-muted py-2">
+              Download resume (PDF)
+            </a>
+            <div className="flex justify-center pt-2"><MotionToggle withLabel /></div>
+          </div>
+        </div>
+      </Dialog>
     </>
   );
 }

@@ -8,7 +8,8 @@ export const siteConfig = {
   title:
     "Thanaphat Chirutpadathorn (North) | Technical Consultant, Engineering Manager & Tech Entrepreneur",
   nameThai: "ฐานพัฒน์ จิรุตม์ผะดาทร",
-  description: `Technical Consultant & Engineering Manager with ${defaultExperience.totalYearsDisplay}+ years in software development, web & mobile app architecture. Founder of JongQue.com (ระบบจองคิวออนไลน์). ${defaultExperience.leadershipYearsDisplay}+ years leading engineering teams. Specializing in scalable systems, Agile transformation, and end-to-end technical advisory.`,
+  role: "Senior Engineering Manager · Healthcare Technology",
+  description: `Senior Engineering Manager & Technical Consultant with ${defaultExperience.totalYearsDisplay} years in software engineering and ${defaultExperience.leadershipYearsDisplay} years leading teams. Heads a 30+ engineer healthcare-tech organization, scaled it by 50%, drove ISO 27001/9001 and a 3x deployment-frequency gain. Founder of JongQue.com (ระบบจองคิวออนไลน์).`,
   url: "https://thanaphat-north.com",
   ogImage: "/opengraph-image",
   resumeUrl: "/Thanaphat-Chirutpadathorn-Resume.pdf",
@@ -20,106 +21,145 @@ export const siteConfig = {
 };
 
 export const navLinks = [
-  { href: "#impact", label: "Impact" },
-  { href: "#experience", label: "Experience" },
+  { href: "#work", label: "Work" },
+  { href: "#journey", label: "Journey" },
   { href: "#services", label: "Services" },
   { href: "#ventures", label: "Ventures" },
-  { href: "#tech-stack", label: "Tech Stack" },
   { href: "/blog", label: "Blog", isExternal: true },
 ];
+
+/** Bangkok — the "N" in North. Shown as a signature motif. */
+export const coordinates = "N 13°45′22″ · E 100°30′06″";
 
 export const impactStats = [
   {
     value: 30,
     suffix: "+",
-    label: "Engineers Managed",
-    description: "Led and mentored cross-functional teams",
+    label: "Engineers led",
+    description: "Cross-functional healthcare-tech organization",
+    icon: "users",
   },
   {
-    value: 30,
+    value: 3,
+    suffix: "×",
+    label: "Deployment frequency",
+    description: "AI-assisted workflow, pilot → org-wide",
+    icon: "rocket",
+  },
+  {
+    value: 50,
     suffix: "%",
-    label: "Efficiency Boost",
-    description: "Through Agile & CI/CD optimization",
+    label: "Org scaled",
+    description: "18 engineers hired & onboarded in 3 months",
+    icon: "trending",
   },
   {
     value: 25,
     suffix: "%",
-    label: "Bug Reduction",
-    description: "By implementing structured QA & automated testing",
+    label: "Fewer defects",
+    description: "Code review & release governance",
+    icon: "shield",
   },
-  {
-    value: 0,
-    suffix: "",
-    label: "ISO 27001/9001",
-    description: "Security & Compliance expert",
-    isText: true,
-  },
+] as const;
+
+export const credentials = [
+  "ISO 27001 / 9001",
+  "PSM I · Scrum.org",
+  "OutSystems Tech Lead & Architecture Specialist",
+  "B.Sc. Media Technology · KMUTT",
 ];
 
 export const experiences = [
   {
     company: "Invitrace",
-    role: "Engineering Manager",
-    period: "2025 - Present",
+    role: "Senior Engineering Manager",
+    period: "Jul 2026 – Present",
+    year: "2026",
     description:
-      "Leading and inspiring a high-performing software development team building multiple products, aligning technical strategy with business priorities to accelerate delivery.",
+      "Leading the engineering organization end-to-end: 30+ cross-functional engineers delivering secure healthcare technology — patient-facing apps, employee-health products and hospital back-office systems under one delivery org.",
     highlights: [
-      "Mentored 30+ cross-functional engineers with regular 1:1 sessions",
-      "Achieved 30% boost in efficiency through team collaboration and prioritization",
-      "Ensured ISO 27001/9001 compliance and passed penetration testing",
-      "Reduced production bugs by 25% through structured QA process",
+      "Own hiring strategy, performance management and technical direction",
+      "Brought the hospital internal-systems team into a single delivery organization",
+      "Matured the AI-assisted workflow to a 3× gain in deployment frequency & cycle time",
+      "Completed the org-wide shift to a flow-based (Kanban) operating model",
+    ],
+  },
+  {
+    company: "Invitrace",
+    role: "Engineering Manager / Delivery Lead",
+    period: "Aug 2025 – Jun 2026",
+    year: "2025",
+    description:
+      "Managed delivery across all product teams — a patient-facing hospital app and an employee health & wellness app — owning hiring, onboarding and performance reviews.",
+    highlights: [
+      "Scaled AI developer tooling from a single-team pilot to the whole organization",
+      "Designed structured QA (test planning, regression coverage) to stabilize releases",
+      "Ran delivery hands-on in Jira: backlog, boards and stakeholder reporting",
+      "Introduced Kanban governance, knowledge-sharing sessions and regular 1:1s",
     ],
   },
   {
     company: "Invitrace",
     role: "Tech Lead",
-    period: "2024 - 2025",
+    period: "Sep 2024 – Jul 2025",
+    year: "2024",
     description:
-      "Elevated execution by guiding technical decisions and fostering accountability, while streamlining workflows through AI tools adoption.",
+      "Led a cross-functional squad shipping 7+ products around the employee health & wellness app, aligning technical strategy with business priorities.",
     highlights: [
-      "Improved developer productivity by 30% through AI tools training",
-      "Expanded team capacity by 50% (15-20 members in 3 months)",
-      "Raised successful task completion rates by 25%",
-      "Created reusable infrastructure templates and standardized setup",
+      "Grew team capacity 50% — 18 engineers recruited & onboarded in 3 months",
+      "Piloted AI developer tools with responsible-usage training (~30% productivity)",
+      "Drove ISO 27001/9001 certification through security & process standardization",
+      "~25% fewer production defects; 40% less design time via reusable templates",
     ],
   },
   {
     company: "iPassion",
     role: "Tech Lead & Team Lead",
-    period: "2023 - 2024",
+    period: "Jun 2023 – Aug 2024",
+    year: "2023",
     description:
-      "Led a 30-member team to integrate legacy systems into a unified platform, streamlining data flow and eliminating silos.",
+      "Led a 30-member team integrating 10 legacy systems into one unified platform for an enterprise automotive manufacturer.",
     highlights: [
-      "Integrated 10 legacy systems into one unified platform",
-      "Applied Agile practices to increase delivery speed and predictability",
-      "Drove continuous improvement through regular retrospectives",
-      "Monitored risks and implemented proactive mitigation strategies",
+      "Unified 10 legacy systems, streamlining data flow and removing silos",
+      "Raised delivery speed and predictability with agile practices",
+      "Ran proactive risk monitoring and mitigation for consistent delivery",
     ],
   },
   {
     company: "iPassion",
-    role: "Technical Lead (Low Code)",
-    period: "2021 - 2023",
+    role: "Technical Lead & Solution Consultant (Pre-Sales)",
+    period: "Jul 2020 – May 2023",
+    year: "2020",
     description:
-      "Designed databases and technical solutions, consulted low-code developer teams, and provided pre-sales technical guidance.",
+      "Modeled business processes, designed databases and solutions, advised low-code teams and partnered with sales on proposals for automotive and finance clients.",
     highlights: [
-      "Reduced manual work by 20% through process automation",
-      "Developed career path frameworks for HR development",
-      "Reduced post-sale rework by 20% through seamless handoffs",
-      "Delivered accurate proposals improving bid competitiveness",
+      "~20% less manual work through process automation",
+      "LINE Bot for support-issue triage — ~30% faster assignment",
+      "~20% less post-sale rework through tailored proposals & demos",
     ],
   },
   {
     company: "iPassion",
     role: "Software Developer",
-    period: "2018 - 2021",
+    period: "Jul 2018 – Jun 2020",
+    year: "2018",
     description:
-      "Developed front-end applications with Angular and React, built mobile apps achieving stable performance with 95%+ crash-free rate.",
+      "Built front-end apps (Angular, React) and cross-platform mobile apps (Ionic, React Native) with a 95%+ crash-free rate.",
     highlights: [
-      "Built mobile apps with Ionic and React Native (95%+ crash-free)",
-      "Integrated APIs reducing user-facing errors by 20%",
-      "Contributed to code quality through peer reviews",
-      "Helped reduce production bugs by 15%",
+      "95%+ crash-free mobile releases",
+      "API integrations that cut user-facing errors by ~20%",
+    ],
+  },
+  {
+    company: "Codediva",
+    role: "Software Developer",
+    period: "Jun 2017 – Jul 2018",
+    year: "2017",
+    description:
+      "Delivered Android apps end-to-end, ran UAT with client users, and built Java libraries for POS transaction processing.",
+    highlights: [
+      "End-to-end Android delivery, from development to handover",
+      "Independent UAT with client users before every release",
     ],
   },
 ];
@@ -144,10 +184,10 @@ export const services = [
     description:
       "Optimize your team's delivery and establish best practices for predictable outcomes.",
     features: [
-      "Jira Workflow Setup & Optimization",
-      "CI/CD Pipeline Implementation",
-      "Sprint Planning & Retrospectives",
-      "Predictable Delivery Frameworks",
+      "Scrum → Kanban / flow-based delivery",
+      "Jira workflow, boards & delivery reporting",
+      "Delivery metrics: deployment frequency, cycle time",
+      "AI-assisted development rollout & governance",
     ],
     icon: "Target",
   },
@@ -225,22 +265,22 @@ export const philosophyPillars = [
 ];
 
 export const techStack = {
-  cloud: [
-    { name: "AWS", icon: "aws" },
-    { name: "Docker", icon: "docker" },
-    { name: "Kubernetes", icon: "kubernetes" },
-  ],
   frontend: [
-    { name: "Next.js", icon: "nextjs" },
     { name: "React", icon: "react" },
     { name: "React Native", icon: "react-native" },
-    { name: "TypeScript", icon: "typescript" },
+    { name: "Next.js", icon: "nextjs" },
+    { name: "Angular", icon: "angular" },
   ],
   backend: [
     { name: "Node.js", icon: "nodejs" },
     { name: "NestJS", icon: "nestjs" },
-    { name: "Java", icon: "java" },
-    { name: "Spring Boot", icon: "spring" },
+    { name: "Express", icon: "express" },
+    { name: "C#", icon: "csharp" },
+  ],
+  cloud: [
+    { name: "AWS", icon: "aws" },
+    { name: "Docker", icon: "docker" },
+    { name: "CI/CD", icon: "cicd" },
   ],
   database: [
     { name: "PostgreSQL", icon: "postgresql" },

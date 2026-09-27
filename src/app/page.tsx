@@ -11,6 +11,10 @@ import { Ventures } from "@/components/sections/Ventures";
 import { Philosophy } from "@/components/sections/Philosophy";
 import { TechStack } from "@/components/sections/TechStack";
 import { LatestBlog } from "@/components/sections/LatestBlog";
+import { Summit } from "@/components/sections/Summit";
+import { CompassProgress } from "@/components/fx/CompassProgress";
+import { MotionProvider } from "@/motion/MotionProvider";
+import { ContactProvider } from "@/components/contact/ContactProvider";
 import { getExperienceYears } from "@/lib/supabase-server";
 
 // Loading skeleton for portfolio section
@@ -120,29 +124,34 @@ export default async function Home() {
   const experience = await getExperienceYears();
 
   return (
-    <>
-      <CustomCursor />
-      <Navigation />
-      <main>
-        <Hero experience={experience} />
-        <ImpactDashboard />
-        <ExperienceTimeline />
-        {/* Portfolio section with split layout */}
-        <Suspense fallback={<PortfolioSkeleton />}>
-          <Portfolio />
-        </Suspense>
-        <FreelanceServices />
-        {/* Suspense enables streaming - shell renders immediately, data streams in */}
-        <Suspense fallback={<VenturesSkeleton />}>
-          <Ventures />
-        </Suspense>
-        <Suspense fallback={<BlogSkeleton />}>
-          <LatestBlog />
-        </Suspense>
-        <Philosophy />
-        <TechStack />
-      </main>
-      <Footer />
-    </>
+    <MotionProvider>
+      <ContactProvider>
+        <div className="grain">
+          <CustomCursor />
+          <Navigation />
+          <CompassProgress />
+          <main id="main">
+            <Hero experience={experience} />
+            <ImpactDashboard />
+            <Suspense fallback={<PortfolioSkeleton />}>
+              <Portfolio />
+            </Suspense>
+            <ExperienceTimeline />
+            <FreelanceServices />
+            {/* Suspense enables streaming - shell renders immediately, data streams in */}
+            <Suspense fallback={<VenturesSkeleton />}>
+              <Ventures />
+            </Suspense>
+            <Philosophy />
+            <Suspense fallback={<BlogSkeleton />}>
+              <LatestBlog />
+            </Suspense>
+            <TechStack />
+            <Summit />
+          </main>
+          <Footer />
+        </div>
+      </ContactProvider>
+    </MotionProvider>
   );
 }

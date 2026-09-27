@@ -334,6 +334,7 @@ export function CoverImageUpload({
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
                 <img
                   src={value}
                   alt="Cover preview"
@@ -394,6 +395,7 @@ export function CoverImageUpload({
               </span>
             </p>
             <div className="relative w-full aspect-[4/3] max-w-[300px] rounded-lg overflow-hidden border border-border">
+              {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
               <img
                 src={value}
                 alt="Focal point preview"

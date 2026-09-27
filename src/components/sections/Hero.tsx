@@ -1,293 +1,311 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { useRef, useState } from "react";
 import {
-  ArrowDown,
-  Briefcase,
-  MessageSquare,
-  Download,
-  Sparkles,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
+import { ArrowDownRight, Sparkles } from "lucide-react";
+import { useLenis } from "lenis/react";
 import { Button } from "@/components/ui/Button";
-import { siteConfig } from "@/lib/constants";
-import { ExperienceYears } from "@/lib/experience";
+import { Magnetic } from "@/components/fx/Magnetic";
+import { FrameSequence } from "@/components/fx/FrameSequence";
+import { AmbientVideo } from "@/components/fx/AmbientVideo";
+import { CodeMosaic } from "@/components/fx/CodeMosaic";
+import { useContact } from "@/components/contact/ContactProvider";
+import { useMotionTier } from "@/motion/tier";
+import { scrollToTarget } from "@/motion/scrollTo";
+import { depth, pointerSpring } from "@/motion/tokens";
+import { coordinates, siteConfig } from "@/lib/constants";
+import type { ExperienceYears } from "@/lib/experience";
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.2,
-    },
-  },
-};
+const FRAME_COUNT = 71;
+const frameUrl = (i: number) => `/media/frames/hero/f_${String(i).padStart(3, "0")}.webp`;
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.4, 0.25, 1] as const,
-    },
-  },
-};
+/**
+ * Service labels pinned onto blueprint buildings (percent of the 21:9 scene).
+ * They make the metaphor explicit: the "city" is a software system.
+ */
+const SERVICES = [
+  { id: "api-gateway", x: 55.5, y: 47, anchorY: 50 },
+  { id: "patient-app", x: 75.5, y: 59, anchorY: 67 },
+  { id: "auth-service", x: 69, y: 52, anchorY: 63 },
+  { id: "employee-health", x: 82, y: 47, anchorY: 58 },
+  { id: "hospital-core", x: 93.5, y: 62, anchorY: 71 },
+] as const;
+const HUB = { x: 62.7, y: 74 };
+
+/** Pointer offset (-0.5…0.5) → pixel shift scaled by a layer's depth. */
+function useDepthLayer(sx: MotionValue<number>, sy: MotionValue<number>, d: number) {
+  return {
+    x: useTransform(sx, (v) => v * d * 40),
+    y: useTransform(sy, (v) => v * d * 24),
+  };
+}
 
 interface HeroProps {
   experience: ExperienceYears;
 }
 
 export function Hero({ experience }: HeroProps) {
-  const handleScroll = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const tier = useMotionTier();
+  const lenis = useLenis();
+  const { openContact } = useContact();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [built, setBuilt] = useState(false);
+
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+  const p = tier === "static" ? undefined : scrollYProgress;
+
+  // Story: blueprint → city (0–.42) → city holds (.42–.52) → city is rewritten as code (.52–.88) → hand-off.
+  const buildProgress = useTransform(scrollYProgress, [0, 0.42], [0, 1]);
+  const blueprintOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]); // lite crossfade
+  const annotationsOpacity = useTransform(scrollYProgress, [0.05, 0.32], [1, 0]);
+  const towerIn = useTransform(scrollYProgress, [0.34, 0.46], [0, 1]);
+  const codeProgress = useTransform(scrollYProgress, [0.52, 0.88], [0, 1]);
+  const cityOpacity = useTransform(scrollYProgress, [0.55, 0.9], [1, 0.1]);
+  const towerOpacity = useTransform(() => towerIn.get() * cityOpacity.get());
+  const sceneScale = useTransform(scrollYProgress, [0.42, 1], [1, 1.08]);
+  const wordY = useTransform(scrollYProgress, [0, 0.7], ["0%", "-40%"]);
+  const wordOpacity = useTransform(scrollYProgress, [0.5, 0.68], [1, 0]);
+  const copyY = useTransform(scrollYProgress, [0.5, 0.8], ["0%", "-18%"]);
+  const copyOpacity = useTransform(scrollYProgress, [0.52, 0.66], [1, 0]);
+  const gradientOpacity = useTransform(scrollYProgress, [0.52, 0.7], [1, 0.25]);
+  const fadeToInk = useTransform(scrollYProgress, [0.92, 1], [0, 1]);
+  const codeStatementOpacity = useTransform(scrollYProgress, [0.74, 0.82, 0.93], [0, 1, 1]);
+  const codeStatementY = useTransform(scrollYProgress, [0.74, 0.93], ["24px", "-12px"]);
+  const [phase, setPhase] = useState<"blueprint" | "built" | "code">("blueprint");
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const next = v > 0.62 ? "code" : v > 0.44 ? "built" : "blueprint";
+    if (next !== phase) setPhase(next);
+    const isBuilt = v > 0.44;
+    if (isBuilt !== built) setBuilt(isBuilt);
+  });
+
+  // Mouse parallax ("full" tier): each layer shifts by its depth factor.
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, pointerSpring);
+  const sy = useSpring(my, pointerSpring);
+  const farL = useDepthLayer(sx, sy, depth.far);
+  const wordL = useDepthLayer(sx, sy, depth.word);
+  const nearL = useDepthLayer(sx, sy, depth.near);
+  const hintOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const glowX = useTransform(sx, (v) => `${50 + v * 20}%`);
+  const glowY = useTransform(sy, (v) => `${40 + v * 20}%`);
+  const glow = useMotionTemplate`radial-gradient(600px circle at ${glowX} ${glowY}, rgba(255,90,31,0.10), transparent 60%)`;
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (tier !== "full" || e.pointerType !== "mouse") return;
+    mx.set(e.clientX / window.innerWidth - 0.5);
+    my.set(e.clientY / window.innerHeight - 0.5);
   };
+
+  const isStatic = tier === "static";
 
   return (
     <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24"
-      aria-label="Thanaphat North - Technical Consultant, Engineering Manager & Software Architect"
+      id="top"
+      ref={sectionRef}
+      aria-label="Introduction"
+      onPointerMove={onPointerMove}
+      className={isStatic ? "relative h-svh min-h-[640px]" : "relative h-[280svh]"}
+      data-testid="hero"
     >
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-background to-background animate-gradient" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "-3s" }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "-5s" }}
-        />
-      </div>
+      <div className="sticky top-0 h-svh min-h-[640px] overflow-hidden bg-ink">
+        {/* ── Scene: every image layer shares one 21:9 box so they stay aligned ── */}
+        <motion.div className="hero-scene" style={{ scale: p ? sceneScale : 1, x: farL.x, y: farL.y, opacity: p ? cityOpacity : 1 }}>
+          {/* Base: blueprint (start) and real skyline (end) */}
+          <picture>
+            <source type="image/avif" srcSet="/media/hero/skyline-1440.avif 1440w, /media/hero/skyline.avif 2560w" sizes="(max-width: 1440px) 1440px, 2560px" />
+            <img src="/media/hero/skyline.webp" alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority={isStatic ? "high" : "auto"} />
+          </picture>
 
-      {/* Grid Pattern Overlay */}
-      <div
-        className="absolute inset-0 -z-10 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(var(--foreground) 1px, transparent 1px),
-                           linear-gradient(90deg, var(--foreground) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
+          {!isStatic && (
+            <motion.picture style={{ opacity: tier === "full" ? 1 : blueprintOpacity }} className="absolute inset-0">
+              <source type="image/avif" srcSet="/media/hero/blueprint.avif" />
+              {/* eslint-disable-next-line @next/next/no-img-element -- art-directed, pre-encoded layer */}
+              <img src="/media/hero/blueprint.webp" alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" data-testid="hero-blueprint" />
+            </motion.picture>
+          )}
 
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="max-w-5xl mx-auto px-4 md:px-6 text-center"
-      >
-        {/* Free Consultation Badge */}
-        <motion.div variants={itemVariants} className="mb-4">
-          <span className="free-consult-badge inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 text-accent text-sm font-semibold shadow-lg shadow-accent/10">
-            <Sparkles size={16} className="animate-pulse" />
-            Free 1st Consultation Session
-            <ArrowRight size={14} />
-          </span>
+          {tier === "full" && <FrameSequence count={FRAME_COUNT} frame={frameUrl} progress={buildProgress} />}
+
+          {/* Ambient life once the city is built */}
+          {!isStatic && (
+            <motion.div className="absolute inset-0" style={{ opacity: towerOpacity }}>
+              <AmbientVideo src="/media/loops/hero-loop" poster="/media/hero/skyline.webp" enabled={built || tier === "lite"} />
+            </motion.div>
+          )}
+
+          {/* System-diagram annotations (blueprint phase) */}
+          {!isStatic && (
+            <motion.svg
+              viewBox="0 0 100 42.857"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full"
+              style={{ opacity: annotationsOpacity }}
+              aria-hidden="true"
+            >
+              {SERVICES.map((s) => (
+                <path
+                  key={s.id}
+                  d={`M ${s.x} ${(s.anchorY * 42.857) / 100} L ${HUB.x} ${(HUB.y * 42.857) / 100}`}
+                  className="hero-dataline"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </motion.svg>
+          )}
+          {!isStatic && (
+            <motion.div className="absolute inset-0" style={{ opacity: annotationsOpacity }} aria-hidden="true">
+              {SERVICES.map((s) => (
+                <span key={s.id} className="hero-tag" style={{ left: `${s.x}%`, top: `${s.y}%` }}>
+                  <span className="hero-tag-dot" />
+                  {s.id}
+                </span>
+              ))}
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Availability Badge */}
-        <motion.div variants={itemVariants} className="mb-6">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Available for Hire — Limited Slots
-          </span>
-        </motion.div>
+        {/* Mouse glow */}
+        {tier === "full" && <motion.div className="absolute inset-0 pointer-events-none" style={{ background: glow }} aria-hidden="true" />}
 
-        {/* Name */}
-        <motion.p
-          variants={itemVariants}
-          className="text-lg md:text-xl text-accent font-medium mb-4"
-        >
-          Hi, I&apos;m Thanaphat (North)
-        </motion.p>
-
-        {/* Main Headline - Client-focused */}
-        <motion.h1
-          variants={itemVariants}
-          className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
-        >
-          I Help Businesses
-          <br className="hidden md:block" />
-          <span className="gradient-text">
-            Ship Faster & Scale Smarter
-          </span>
-        </motion.h1>
-
-        {/* Sub-headline - Value proposition */}
-        <motion.p
-          variants={itemVariants}
-          className="text-lg md:text-xl text-muted max-w-3xl mx-auto mb-8 leading-relaxed"
-        >
-          Technical Consultant & Engineering Manager with{" "}
-          {experience.totalYearsDisplay}+ years designing scalable
-          architectures and leading high-performing teams. From strategy to
-          delivery — I turn your tech challenges into competitive advantages.
-        </motion.p>
-
-        {/* Trust Points */}
+        {/* Wordmark — sits BEHIND the tower cutout (text-behind-object) */}
         <motion.div
-          variants={itemVariants}
-          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-10 text-sm text-muted"
+          className="absolute inset-x-0 top-[12svh] flex justify-center pointer-events-none select-none"
+          style={{ y: p ? wordY : 0, opacity: p ? wordOpacity : 1, x: wordL.x }}
+          aria-hidden="true"
         >
-          <span className="inline-flex items-center gap-1.5">
-            <CheckCircle2 size={15} className="text-emerald-400" />
-            AWS & Cloud Expert
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <CheckCircle2 size={15} className="text-emerald-400" />
-            Agile & DevOps
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <CheckCircle2 size={15} className="text-emerald-400" />
-            ISO 27001/9001
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <CheckCircle2 size={15} className="text-emerald-400" />
-            30+ Engineers Managed
+          <span className="font-display font-bold leading-none tracking-[-0.04em] text-paper/90 text-[min(22vw,27svh)]">
+            NORTH
           </span>
         </motion.div>
 
-        {/* CTAs */}
+        {/* Foreground tower cutout, same scene box */}
+        <motion.div className="hero-scene pointer-events-none" style={{ scale: p ? sceneScale : 1, x: nearL.x, y: nearL.y, opacity: isStatic ? 1 : towerOpacity }} aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element -- alpha cutout layer */}
+          <img src="/media/hero/tower.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        </motion.div>
+
+        {/* Legibility gradient for the copy; fades out with it so the code phase stays bright */}
+        <motion.div className="absolute inset-0 pointer-events-none" style={{ opacity: p ? gradientOpacity : 1 }} aria-hidden="true">
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/20 to-transparent" />
+        </motion.div>
+
+        {/* The city, rewritten as the code that runs it */}
+        {!isStatic && (
+          <motion.div className="hero-scene pointer-events-none" style={{ scale: sceneScale, x: farL.x, y: farL.y }} aria-hidden="true">
+            <CodeMosaic key={tier} src="/media/hero/blueprint.webp" progress={codeProgress} cell={tier === "full" ? 8 : 10} />
+          </motion.div>
+        )}
+
+
+        {/* Corner annotations */}
+        <div className="absolute top-20 md:top-24 inset-x-0 max-w-7xl mx-auto px-4 md:px-6 flex justify-between pointer-events-none">
+          <span className="label-mono">Sheet 00 / 09 · System architecture</span>
+          <span className="label-mono hidden sm:inline">{coordinates}</span>
+        </div>
+
+        {/* Copy — visible at first paint (no opacity:0 on the LCP text) */}
         <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 flex-wrap"
+          className="absolute inset-x-0 bottom-0 max-w-7xl mx-auto px-4 md:px-6 pb-14 md:pb-20"
+          style={{ y: p ? copyY : 0, opacity: p ? copyOpacity : 1 }}
         >
-          <Button
-            variant="primary"
-            size="lg"
-            leftIcon={<Sparkles size={20} />}
-            onClick={() => handleScroll("#services")}
-            className="animate-pulse-glow"
-          >
-            Book Free Consultation
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            leftIcon={<Briefcase size={20} />}
-            onClick={() => handleScroll("#experience")}
-          >
-            View My Experience
-          </Button>
-          <Button
-            variant="ghost"
-            size="lg"
-            leftIcon={<MessageSquare size={20} />}
-            onClick={() => handleScroll("#services")}
-          >
-            Explore Consulting Services
-          </Button>
-        </motion.div>
-
-        {/* Free Consult Details */}
-        <motion.div
-          variants={itemVariants}
-          className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 border border-border text-sm text-muted"
-        >
-          <Sparkles size={14} className="text-accent" />
-          <span>
-            <span className="text-foreground font-medium">First consultation is free</span>
-            {" "}— 30 min strategy call, no strings attached
-          </span>
-        </motion.div>
-
-        {/* Download Resume */}
-        <motion.div variants={itemVariants} className="mt-4">
-          <a
-            href={siteConfig.resumeUrl}
-            download="Thanaphat-Chirutpadathorn-Resume.pdf"
-            className="inline-flex items-center gap-2 text-muted hover:text-accent transition-colors text-sm font-medium group"
-          >
-            <Download
-              size={16}
-              className="group-hover:animate-bounce"
-            />
-            Download Resume (PDF)
-          </a>
-        </motion.div>
-
-        {/* Stats Preview */}
-        <motion.div
-          variants={itemVariants}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
-        >
-          {/* Projects Delivered */}
-          <div className="text-center p-4 rounded-xl bg-card/30 border border-border/50 hover:border-accent/30 transition-colors">
-            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-              30+
+          <div className="max-w-2xl">
+            <p className="[@media(max-height:820px)]:hidden inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full glass border border-border text-xs md:text-sm text-foreground/90">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-dot" aria-hidden="true" />
+              Available for consulting · free 30-min call
+            </p>
+            <p className="label-mono !text-accent mb-3">{siteConfig.role}</p>
+            <h1 className="font-display text-[2.4rem] leading-[1.02] sm:text-5xl md:text-6xl lg:text-[min(4.75rem,7svh)] font-bold tracking-tight text-paper">
+              I turn software blueprints into systems that{" "}
+              <span className="font-serif-accent text-accent">ship.</span>
+            </h1>
+            <p className="mt-5 text-base md:text-lg text-paper/75 max-w-xl leading-relaxed">
+              Thanaphat (North) — {experience.totalYearsDisplay} years in software,{" "}
+              {experience.leadershipYearsDisplay} leading teams. I head a 30+ engineer healthcare-tech organization and
+              help companies scale delivery, architecture and people.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Magnetic>
+                <Button size="lg" leftIcon={<Sparkles size={18} />} onClick={() => openContact()} data-cursor="talk" data-testid="hero-cta">
+                  Book a free consult
+                </Button>
+              </Magnetic>
+              <Button
+                size="lg"
+                variant="outline"
+                rightIcon={<ArrowDownRight size={18} />}
+                onClick={() => scrollToTarget("#work", lenis)}
+                data-testid="hero-work"
+              >
+                See my work
+              </Button>
             </div>
-            <div className="text-sm text-muted">
-              Engineers Managed
-            </div>
-          </div>
-          {/* Years in Tech - Dynamic */}
-          <div className="text-center p-4 rounded-xl bg-card/30 border border-border/50 hover:border-accent/30 transition-colors">
-            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-              {experience.totalYearsDisplay}
-            </div>
-            <div className="text-sm text-muted">Years in Tech</div>
-          </div>
-          {/* Efficiency Boost */}
-          <div className="text-center p-4 rounded-xl bg-card/30 border border-border/50 hover:border-accent/30 transition-colors">
-            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-              30%
-            </div>
-            <div className="text-sm text-muted">Efficiency Boost</div>
-          </div>
-          {/* Client Satisfaction */}
-          <div className="text-center p-4 rounded-xl bg-card/30 border border-border/50 hover:border-accent/30 transition-colors">
-            <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-              ISO
-            </div>
-            <div className="text-sm text-muted">27001/9001</div>
           </div>
         </motion.div>
 
-        {/* SEO: Hidden semantic content for search engines */}
-        <div className="sr-only" aria-hidden="false">
-          <h2>Technical Consultant, Engineering Manager &amp; Software Architect Portfolio</h2>
-          <p>
-            Thanaphat North (ฐานพัฒน์) — Technical Consultant and Engineering Manager
-            specializing in scalable architecture design, web &amp; mobile app development,
-            Agile transformation, and end-to-end technical advisory. Founder of
-            JongQue.com (จองคิว / ระบบจองคิวออนไลน์ / online booking &amp; queue management system),
-            BuildYourThinks.com (startup ideas platform), and Visibr.com (tech blog).
-            Available for consulting engagements, fractional CTO roles, and technical
-            advisory in Thailand and worldwide. Portfolio of ventures, blog, and projects.
+        {/* Code phase statement */}
+        {!isStatic && (
+          <motion.div
+            className="absolute inset-x-0 top-1/2 -translate-y-1/2 max-w-7xl mx-auto px-4 md:px-6 pointer-events-none"
+            style={{ opacity: codeStatementOpacity, y: codeStatementY }}
+          >
+            <div className="max-w-3xl rounded-2xl glass border border-border/60 p-6 md:p-8">
+              <p className="label-mono !text-accent mb-3">{"// what's underneath"}</p>
+              <p className="font-display text-3xl md:text-5xl font-bold leading-tight text-paper">
+                Every city runs on code. I build the teams, pipelines and{" "}
+                <span className="font-serif-accent text-accent">AI-assisted</span> workflows that write it.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Caption + terminal line (bottom-right) */}
+        <div className="absolute bottom-6 right-4 md:right-6 hidden lg:block text-right pointer-events-none" aria-hidden="true">
+          <p className="label-mono mb-2">
+            {phase === "code" ? "…and runs on code that ships." : "Every system starts as a blueprint."}
+          </p>
+          <p className="font-mono text-xs text-paper/80" data-testid="hero-terminal">
+            <span className="text-accent">$</span>{" "}
+            {phase === "code" ? (
+              <>
+                ai-agent implement --spec=blueprint.md <span className="caret">▍</span>
+              </>
+            ) : (
+              <>
+                deploy --env=production{" "}
+                {built || isStatic ? <span className="text-emerald-400">✓ live</span> : <span className="caret">▍</span>}
+              </>
+            )}
           </p>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.button
-            onClick={() => handleScroll("#impact")}
-            className="flex flex-col items-center gap-2 text-muted hover:text-foreground transition-colors"
-            animate={{ y: [0, 8, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-              ease: "easeInOut",
-            }}
-            aria-label="Scroll to next section"
+        {/* Scroll hint */}
+        {!isStatic && (
+          <motion.div
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 label-mono hidden md:flex flex-col items-center gap-2 pointer-events-none"
+            style={{ opacity: hintOpacity }}
+            aria-hidden="true"
           >
-            <span className="text-xs uppercase tracking-wider">
-              Scroll
-            </span>
-            <ArrowDown size={20} />
-          </motion.button>
-        </motion.div>
-      </motion.div>
+            Scroll to build
+            <span className="block w-px h-8 bg-gradient-to-b from-accent to-transparent" />
+          </motion.div>
+        )}
+
+        {/* Hand-off to the next section */}
+        {!isStatic && <motion.div className="absolute inset-0 bg-ink pointer-events-none" style={{ opacity: fadeToInk }} aria-hidden="true" />}
+      </div>
     </section>
   );
 }

@@ -1,160 +1,46 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 import { getDefaultExperienceYears } from "@/lib/experience";
 
-export const runtime = "edge";
-
-export const alt = "Thanaphat Chirutpadathorn (North) - Engineering Manager & Tech Entrepreneur";
-export const size = {
-  width: 1200,
-  height: 630,
-};
+export const alt =
+  "Thanaphat Chirutpadathorn (North) — Senior Engineering Manager & Technical Consultant";
+export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OGImage() {
   const experience = getDefaultExperienceYears();
+  const skyline = await readFile(path.join(process.cwd(), "public/media/og-skyline.jpg"));
+  const bg = `data:image/jpeg;base64,${skyline.toString("base64")}`;
+
   return new ImageResponse(
     (
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#0a0a0a",
-          backgroundImage:
-            "radial-gradient(circle at 25% 25%, #1a1a2e 0%, transparent 50%), radial-gradient(circle at 75% 75%, #16213e 0%, transparent 50%)",
-        }}
-      >
-        {/* Border accent */}
+      <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", backgroundColor: "#07090d" }}>
+        <img src={bg} alt="" width={1200} height={630} style={{ position: "absolute", inset: 0, objectFit: "cover" }} />
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "6px",
-            background: "linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6)",
+            inset: 0,
+            display: "flex",
+            background: "linear-gradient(90deg, rgba(7,9,13,0.95) 0%, rgba(7,9,13,0.75) 45%, rgba(7,9,13,0.1) 100%)",
           }}
         />
-
-        {/* Content container */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "60px",
-          }}
-        >
-          {/* Logo/Initials */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100px",
-              height: "100px",
-              borderRadius: "20px",
-              backgroundColor: "#1a1a1a",
-              border: "3px solid #3b82f6",
-              marginBottom: "40px",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "42px",
-                fontWeight: "bold",
-                color: "#fafafa",
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              TN
-            </span>
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 72px", width: "100%" }}>
+          <div style={{ display: "flex", fontSize: 20, letterSpacing: 4, color: "#ff5a1f", textTransform: "uppercase" }}>
+            Senior Engineering Manager · Healthcare Tech
           </div>
-
-          {/* Name */}
-          <h1
-            style={{
-              fontSize: "56px",
-              fontWeight: "bold",
-              color: "#fafafa",
-              margin: "0 0 8px 0",
-              fontFamily: "system-ui, sans-serif",
-              textAlign: "center",
-            }}
-          >
-            Thanaphat Chirutpadathorn
-          </h1>
-
-          {/* Nickname */}
-          <p
-            style={{
-              fontSize: "28px",
-              color: "#71717a",
-              margin: "0 0 20px 0",
-              fontFamily: "system-ui, sans-serif",
-              textAlign: "center",
-            }}
-          >
-            (North)
-          </p>
-
-          {/* Title */}
-          <p
-            style={{
-              fontSize: "32px",
-              color: "#3b82f6",
-              margin: "0 0 24px 0",
-              fontFamily: "system-ui, sans-serif",
-              textAlign: "center",
-            }}
-          >
-            Engineering Manager & Tech Entrepreneur
-          </p>
-
-          {/* Description */}
-          <p
-            style={{
-              fontSize: "22px",
-              color: "#a1a1aa",
-              margin: 0,
-              fontFamily: "system-ui, sans-serif",
-              textAlign: "center",
-              maxWidth: "800px",
-              lineHeight: 1.5,
-            }}
-          >
-            {experience.totalYearsDisplay} years in Software Development • Agile Expert • Freelance Available
-          </p>
-        </div>
-
-        {/* URL at bottom */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "40px",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "20px",
-              color: "#71717a",
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            thanaphat-north.com
-          </span>
+          <div style={{ display: "flex", fontSize: 128, fontWeight: 800, color: "#ede6d9", letterSpacing: -4, lineHeight: 1, marginTop: 16 }}>
+            NORTH<span style={{ color: "#ff5a1f" }}>.</span>
+          </div>
+          <div style={{ display: "flex", fontSize: 40, color: "#ede6d9", marginTop: 20, maxWidth: 680, lineHeight: 1.2 }}>
+            I turn software blueprints into systems that ship.
+          </div>
+          <div style={{ display: "flex", fontSize: 24, color: "#9a9384", marginTop: 28 }}>
+            {`Thanaphat Chirutpadathorn · ${experience.totalYearsDisplay} yrs in software · 30+ engineers led`}
+          </div>
         </div>
       </div>
     ),
-    {
-      ...size,
-    }
+    { ...size }
   );
 }

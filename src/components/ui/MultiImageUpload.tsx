@@ -252,6 +252,7 @@ export function MultiImageUpload({
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {value.map((url, index) => (
             <div key={index} className="relative group">
+              {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
               <img
                 src={url}
                 alt={`Gallery ${index + 1}`}

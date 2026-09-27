@@ -62,8 +62,8 @@ export function calculateExperienceYears(
 /**
  * Default start dates (fallback if database is unavailable)
  */
-export const DEFAULT_CAREER_START_DATE = "2018-01-01";
-export const DEFAULT_LEADERSHIP_START_DATE = "2021-01-01";
+export const DEFAULT_CAREER_START_DATE = "2017-06-01";
+export const DEFAULT_LEADERSHIP_START_DATE = "2020-07-01";
 
 /**
  * Get default experience years (for fallback scenarios)
