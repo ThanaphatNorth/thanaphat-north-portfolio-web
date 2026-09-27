@@ -45,7 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (posts && posts.length > 0) {
       const blogUrls: MetadataRoute.Sitemap = posts.map((post) => ({
         url: `${siteConfig.url}/blog/${post.slug}`,
-        lastModified: new Date(post.updated_at),
+        // An invalid/missing date would throw in toISOString and fail the whole build.
+        lastModified: validDate(post.updated_at),
         changeFrequency: "weekly",
         priority: 0.7,
       }));
@@ -57,4 +58,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   return baseUrls;
+}
+
+function validDate(value: string | null | undefined): Date | undefined {
+  if (!value) return undefined;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? undefined : d;
 }

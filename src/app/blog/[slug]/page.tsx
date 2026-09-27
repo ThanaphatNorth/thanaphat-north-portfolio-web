@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import { ShareButton } from "@/components/ui/ShareButton";
 import { siteConfig } from "@/lib/constants";
+import { Markdown } from "@/components/content/Markdown";
+import { safeJsonLd } from "@/lib/security";
 
 interface BlogPost {
   id: string;
@@ -117,41 +119,6 @@ function formatDate(dateString: string | null): string {
   });
 }
 
-// Simple markdown-like rendering (for basic formatting)
-function renderContent(content: string): string {
-  return content
-    // Headers
-    .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold text-white mt-8 mb-4">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-white mt-10 mb-4">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mt-12 mb-6">$1</h1>')
-    // Bold and italic
-    .replace(/\*\*\*(.*?)\*\*\*/gim, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')
-    // Code blocks
-    .replace(/```(\w+)?\n([\s\S]*?)```/gim, '<pre class="bg-[#1e1e1e] border border-border rounded-lg p-4 overflow-x-auto my-6"><code class="text-sm font-mono text-gray-200">$2</code></pre>')
-    // Inline code
-    .replace(/`([^`]+)`/gim, '<code class="bg-[#1e1e1e] px-1.5 py-0.5 rounded text-sm font-mono text-accent">$1</code>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" class="text-accent hover:text-accent-hover underline" target="_blank" rel="noopener noreferrer">$1</a>')
-    // Images
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/gim, '<img src="$2" alt="$1" class="rounded-lg my-6 w-full" />')
-    // Blockquotes
-    .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-accent pl-4 my-4 text-gray-300 italic">$1</blockquote>')
-    // Unordered lists
-    .replace(/^\- (.*$)/gim, '<li class="ml-6 list-disc text-gray-300">$1</li>')
-    // Ordered lists
-    .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 list-decimal text-gray-300">$1</li>')
-    // Horizontal rule
-    .replace(/^---$/gim, '<hr class="border-border my-8" />')
-    // Paragraphs (wrap remaining text)
-    .replace(/^(?!<[hlpbuio]|<\/|<pre|<block|<img|<hr)(.+)$/gim, '<p class="text-gray-300 leading-relaxed mb-4">$1</p>')
-    // Clean up empty paragraphs
-    .replace(/<p class="text-gray-300 leading-relaxed mb-4"><\/p>/gim, '')
-    // Wrap consecutive list items
-    .replace(/(<li[^>]*>.*<\/li>\n?)+/gim, '<ul class="my-4">$&</ul>');
-}
-
 export default async function BlogPostPage({
   params,
 }: {
@@ -164,7 +131,6 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const renderedContent = renderContent(post.content);
   const postUrl = `${siteConfig.url}/blog/${post.slug}`;
 
   // JSON-LD Article structured data
@@ -197,7 +163,7 @@ export default async function BlogPostPage({
     <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(articleJsonLd) }}
       />
       {/* Navigation */}
       <nav className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -255,6 +221,7 @@ export default async function BlogPostPage({
         {/* Cover Image */}
           {post.cover_image && (
             <div className="relative rounded-xl overflow-hidden mb-10 bg-background p-4 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
               <img
                 src={post.cover_image}
                 alt={post.title}
@@ -264,10 +231,9 @@ export default async function BlogPostPage({
           )}
 
         {/* Content */}
-          <div
-            className="prose prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: renderedContent }}
-          />
+          <div className="max-w-none">
+            <Markdown>{post.content}</Markdown>
+          </div>
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-border">

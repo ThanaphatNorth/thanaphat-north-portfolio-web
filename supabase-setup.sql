@@ -1,3 +1,7 @@
+-- ⚠️  After running this file, apply every migration in supabase/migrations/ (in order).
+--     20260928000000_admin_only_writes.sql replaces the "authenticated = full access"
+--     policies below with admin-only writes. Without it, ANY signed-in user can edit content.
+
 -- ============================================
 -- Portfolio Contact Form - Supabase Setup
 -- Run this in your Supabase SQL Editor
