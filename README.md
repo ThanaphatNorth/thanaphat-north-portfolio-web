@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# thanaphat-north.com — "TRUE NORTH"
 
-## Getting Started
+Portfolio of Thanaphat Chirutpadathorn (North), Senior Engineering Manager & technical consultant.
+Next.js 16 (App Router, React Compiler) · React 19 · Tailwind 4 · framer-motion + Lenis · Supabase · Resend.
 
-First, run the development server:
+The design concept — *Blueprint → Skyline* — and its rationale live in
+[`../PORTFOLIO-REDESIGN-PLAN.md`](../PORTFOLIO-REDESIGN-PLAN.md) (outside this repo). Generated media is
+catalogued in [`docs/media-assets.md`](docs/media-assets.md).
+
+## Develop
 
 ```bash
+npm ci
+cp .env.example .env.local   # fill in your Supabase + Resend values
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Env | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | content (portfolio, ventures, blog, settings) |
+| `RESEND_API_KEY` | prod | contact-form email; without it contacts are saved but no email is sent |
+| `ADMIN_EMAILS` | recommended | comma-separated admin allow-list for `/admin` (falls back to `ADMIN_EMAIL`, then the owner's address) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`supabase-setup.sql` creates the schema for a fresh project. **Then run every file in
+`supabase/migrations/` in order.** `20260928000000_admin_only_writes.sql` restricts all writes to the
+emails in `public.admin_users` — also disable *Allow new users to sign up* in Supabase Auth.
 
-## Learn More
+> **Two allow-lists, keep them in sync:** `ADMIN_EMAILS` (who can open `/admin`) and the
+> `public.admin_users` table (who can write). Add a new admin to both:
+> `insert into public.admin_users (email) values ('new@admin.com');`
 
-To learn more about Next.js, take a look at the following resources:
+## Motion system
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`src/motion/` decides a **tier** per visitor and every effect degrades with it:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Tier | Who | What runs |
+|---|---|---|
+| `full` | desktop, fine pointer, capable device | Lenis smooth scroll, frame-scrubbed hero, mouse parallax, custom cursor, pinned gallery |
+| `lite` | touch / low-end / data-saver | transform-only scroll effects, native scroll, grid gallery |
+| `static` | `prefers-reduced-motion` or the in-page **Pause motion** toggle | no smooth scroll, no autoplay video, no parallax |
 
-## Deploy on Vercel
+## Test
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run lint && npm run typecheck
+npm run e2e          # desktop + mobile + reduced-motion (Playwright)
+npm run e2e:video    # records the full walkthrough with a visible cursor → e2e/.results/**/video.webm
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The e2e suite starts `e2e/mock-supabase.mjs` (a tiny PostgREST stand-in serving `e2e/fixtures/*.json`,
+public content captured from the live site) and a production build — no real database needed.
