@@ -250,3 +250,70 @@ html[data-motion="static"] *::after {
   background: var(--signal);
   box-shadow: 0 0 10px var(--signal);
 }
+
+/* ── Intro boot sequence ─────────────────────────────────────────────── */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--ink-950);
+  pointer-events: none;
+  animation: intro-out 0.7s var(--ease-in-out-quart, cubic-bezier(0.76, 0, 0.24, 1)) 1.6s forwards;
+}
+html.intro-seen .intro {
+  display: none;
+}
+.intro-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.intro-compass {
+  width: clamp(64px, 6vw, 96px);
+  height: clamp(64px, 6vw, 96px);
+}
+.intro-needle {
+  transform-origin: 32px 32px;
+  animation: intro-needle 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.intro-lines {
+  font-family: var(--font-mono-face), ui-monospace, monospace;
+  font-size: clamp(13px, 1.1vw, 17px);
+  line-height: 1.8;
+  color: var(--paper);
+  min-width: 34ch;
+}
+.intro-line {
+  opacity: 0;
+  animation: intro-show 0.01s linear calc(var(--i) * 0.28s + 0.1s) forwards;
+}
+.intro-type {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  width: 0;
+  animation: intro-type 0.26s steps(28) calc(var(--i) * 0.28s + 0.1s) forwards;
+}
+.intro-ok {
+  color: #34d399;
+  opacity: 0;
+  animation: intro-show 0.01s linear calc(var(--i) * 0.28s + 0.36s) forwards;
+}
+@keyframes intro-show { to { opacity: 1; } }
+@keyframes intro-type { to { width: var(--ch); } }
+@keyframes intro-needle {
+  0% { transform: rotate(-540deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes intro-out {
+  to {
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none; }
+}

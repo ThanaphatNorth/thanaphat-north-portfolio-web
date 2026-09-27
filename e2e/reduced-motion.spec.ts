@@ -12,3 +12,8 @@ test("prefers-reduced-motion → static tier: no smooth scroll, no autoplay vide
   const heroH = await page.getByTestId("hero").evaluate((el) => el.getBoundingClientRect().height);
   expect(heroH).toBeLessThan(1000);
 });
+
+test("reduced motion: no intro overlay", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("intro")).toBeHidden();
+});

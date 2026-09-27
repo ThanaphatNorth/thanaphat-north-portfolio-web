@@ -21,6 +21,7 @@ import {
   getVentures,
 } from "@/lib/supabase-server";
 import { TerminalProvider } from "@/components/terminal/TerminalProvider";
+import { Intro } from "@/components/fx/Intro";
 
 // Loading skeleton for portfolio section
 function PortfolioSkeleton() {
@@ -148,6 +149,7 @@ export default async function Home() {
       <ContactProvider>
         <TerminalProvider data={terminalData}>
           <div className="grain">
+            <Intro />
             <CustomCursor />
             <Navigation />
             <CompassProgress />

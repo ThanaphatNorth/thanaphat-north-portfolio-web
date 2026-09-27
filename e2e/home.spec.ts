@@ -179,3 +179,23 @@ test("hero shows the access badge with the real portrait", async ({ page }) => {
   await expect(badge).toBeVisible();
   await expect(badge.getByRole("img", { name: "Thanaphat (North)" })).toBeVisible();
 });
+
+test("intro plays once per session, never blocks clicks; portrait + WebGL hover present", async ({ page }) => {
+  await page.goto("/");
+  const intro = page.getByTestId("intro");
+  await expect(intro).toBeVisible();
+  expect(await intro.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe("none");
+  await expect(intro).toBeHidden({ timeout: 4000 });
+  await page.reload();
+  await expect(intro).toBeHidden();
+  await expect(page.getByTestId("hero-portrait").locator("img")).toBeVisible();
+  // WebGL layer is created lazily on first hover of a project card
+  await page.evaluate(() => {
+    const g = document.querySelector("[data-testid=portfolio-gallery]")!;
+    window.scrollTo(0, g.getBoundingClientRect().top + scrollY + 10);
+  });
+  await page.waitForTimeout(1500);
+  const card = page.getByTestId("portfolio-card").first();
+  await card.hover();
+  await expect(card.locator("canvas")).toHaveCount(1);
+});

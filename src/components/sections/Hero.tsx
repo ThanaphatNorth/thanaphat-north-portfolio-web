@@ -79,6 +79,7 @@ export function Hero({ experience }: HeroProps) {
   const wordOpacity = useTransform(scrollYProgress, [0.5, 0.68], [1, 0]);
   const copyY = useTransform(scrollYProgress, [0.5, 0.8], ["0%", "-18%"]);
   const copyOpacity = useTransform(scrollYProgress, [0.52, 0.66], [1, 0]);
+  const portraitY = useTransform(scrollYProgress, [0, 0.66], ["0%", "8%"]);
   const gradientOpacity = useTransform(scrollYProgress, [0.52, 0.7], [1, 0.25]);
   const fadeToInk = useTransform(scrollYProgress, [0.92, 1], [0, 1]);
   const codeStatementOpacity = useTransform(scrollYProgress, [0.74, 0.82, 0.93], [0, 1, 1]);
@@ -199,6 +200,24 @@ export function Hero({ experience }: HeroProps) {
           <img src="/media/hero/tower.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
         </motion.div>
 
+        {/* North himself — foreground layer beside the tower (desktop) */}
+        <motion.div
+          className="absolute bottom-0 right-[3vw] h-[64svh] aspect-[992/1200] hidden xl:block pointer-events-none"
+          style={{ x: nearL.x, y: p ? portraitY : 0, opacity: p ? copyOpacity : 1 }}
+          data-testid="hero-portrait"
+          aria-hidden="true"
+        >
+          <picture>
+            <source media="(max-height: 820px)" srcSet="/media/north-700.webp" />
+            <img
+              src="/media/north.webp"
+              alt=""
+              className="h-full w-full object-contain object-bottom [filter:drop-shadow(-10px_0_22px_rgba(255,90,31,0.28))_drop-shadow(0_0_1px_rgba(237,230,217,0.35))_saturate(0.92)_contrast(1.04)]"
+              fetchPriority="low"
+            />
+          </picture>
+        </motion.div>
+
         {/* Legibility gradient for the copy; fades out with it so the code phase stays bright */}
         <motion.div className="absolute inset-0 pointer-events-none" style={{ opacity: p ? gradientOpacity : 1 }} aria-hidden="true">
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-transparent" />
@@ -221,12 +240,12 @@ export function Hero({ experience }: HeroProps) {
 
         {/* Access badge — the person behind the systems (desktop) */}
         <motion.div
-          className="absolute right-6 2xl:right-[6vw] top-[24svh] hidden xl:block"
+          className="absolute right-6 2xl:right-[3vw] top-[13svh] hidden xl:block [@media(max-height:820px)]:!hidden"
           style={{ x: nearL.x, y: nearL.y, opacity: p ? copyOpacity : 1 }}
           data-testid="hero-badge"
         >
           <TiltCard className="rounded-2xl" max={10}>
-            <div className="w-72 rounded-2xl glass border border-border/70 p-4 shadow-2xl shadow-ink/60">
+            <div className="w-60 rounded-2xl glass border border-border/70 p-4 shadow-2xl shadow-ink/60">
               <div className="flex items-center justify-between mb-3">
                 <span className="label-mono !text-accent">Access · production</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-dot" aria-hidden="true" />
@@ -244,8 +263,6 @@ export function Hero({ experience }: HeroProps) {
                 <dd className="text-paper/85">NORTH-2017</dd>
                 <dt className="text-muted">Team</dt>
                 <dd className="text-paper/85">30+ engineers</dd>
-                <dt className="text-muted">Clearance</dt>
-                <dd className="text-paper/85">ISO 27001 / 9001</dd>
               </dl>
               <div className="mt-4 h-6 rounded bg-[repeating-linear-gradient(90deg,var(--paper)_0_2px,transparent_2px_4px,var(--paper)_4px_5px,transparent_5px_8px)] opacity-25" aria-hidden="true" />
             </div>

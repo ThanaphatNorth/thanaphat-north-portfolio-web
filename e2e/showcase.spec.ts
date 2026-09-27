@@ -78,6 +78,7 @@ test("TRUE NORTH — full walkthrough (recorded)", async ({ page }) => {
   const errors = trackErrors(page);
   await page.addInitScript(CURSOR_OVERLAY);
   await page.goto("/");
+  await page.waitForTimeout(2600); // let the boot intro play
   await page.waitForLoadState("networkidle");
   await expect(page.locator("html")).toHaveAttribute("data-motion", "full");
   await page.mouse.move(720, 450);
@@ -126,8 +127,11 @@ test("TRUE NORTH — full walkthrough (recorded)", async ({ page }) => {
   await page.waitForTimeout(700);
   await wheelScroll(page, 1400, 80, 55);
   const card = page.getByTestId("portfolio-card").nth(2);
-  await hoverGlide(page, card);
-  await page.waitForTimeout(900);
+  const p0 = await hoverGlide(page, card);
+  await glide(page, p0.x - 140, p0.y - 90, 30);
+  await glide(page, p0.x + 150, p0.y + 60, 40);
+  await glide(page, p0.x, p0.y, 25);
+  await page.waitForTimeout(600);
   await card.click();
   const drawer = page.getByTestId("portfolio-drawer").getByRole("dialog");
   await expect(drawer).toBeVisible();

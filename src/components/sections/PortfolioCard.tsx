@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { motion, useTransform, type MotionValue } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { cn, parseCategories, stripMarkdown } from "@/lib/utils";
 import type { PortfolioItem } from "@/lib/supabase-server";
+import { WebGLHover } from "@/components/fx/WebGLHover";
+import { useMotionTier } from "@/motion/tier";
 
 interface PortfolioCardProps {
   portfolio: PortfolioItem;
@@ -20,11 +23,16 @@ export function PortfolioCard({ portfolio, onClick, index, total, progress, clas
   const fallback = useTransform(() => 0);
   const innerX = useTransform(progress ?? fallback, [0, 1], ["6%", "-6%"]);
   const types = parseCategories(portfolio.category);
+  const tier = useMotionTier();
+  const [hovered, setHovered] = useState(false);
+  const cover = portfolio.cover_image;
 
   return (
     <button
       type="button"
       onClick={onClick}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
       data-cursor="view"
       data-testid="portfolio-card"
       className={cn("group relative block w-full text-left rounded-2xl focus-visible:outline-none", className)}
@@ -45,6 +53,14 @@ export function PortfolioCard({ portfolio, onClick, index, total, progress, clas
               (e.target as HTMLImageElement).src = "/images/portfolio-placeholder.svg";
             }}
           />
+          {tier === "full" && cover && (
+            <WebGLHover
+              src={cover}
+              focalX={portfolio.cover_image_focal_x ?? 50}
+              focalY={portfolio.cover_image_focal_y ?? 50}
+              active={hovered}
+            />
+          )}
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" aria-hidden="true" />
         <span className="absolute top-4 left-4 label-mono !text-paper/80">
