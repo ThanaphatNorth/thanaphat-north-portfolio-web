@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fixture-1",
+    "title": "บทเรียน 10 ล้าน: เมื่อขายงานแบบ Turn-key แต่ดันสั่งทีมรัน Agile... สูตรสำเร็จสู่หายนะ",
+    "slug": "failed-project-lesson-turnkey-sales-vs-agile-mindset",
+    "excerpt": null,
+    "cover_image": "https://afmwjrjpgbskloerqjnb.supabase.co/storage/v1/object/public/blog-images/covers/1770403459830-9it6hmcngqm.png",
+    "tags": [],
+    "read_time": 5,
+    "published_at": "2026-02-07T00:00:00.000Z",
+    "published": true,
+    "updated_at": "2026-02-07T00:00:00.000Z"
+  },
+  {
+    "id": "fixture-2",
+    "title": "เลิกเป็นแค่คนเขียนโค้ด: ความเข้าใจผิดเรื่อง Algorithm และ Big O ที่ทำให้คุณไม่โตสักที",
+    "slug": "algorithm-big-o",
+    "excerpt": null,
+    "cover_image": "https://afmwjrjpgbskloerqjnb.supabase.co/storage/v1/object/public/blog-images/covers/1770235385970-8nfq8xy0mov.png",
+    "tags": [],
+    "read_time": 5,
+    "published_at": "2026-02-06T00:00:00.000Z",
+    "published": true,
+    "updated_at": "2026-02-06T00:00:00.000Z"
+  },
+  {
+    "id": "fixture-3",
+    "title": "ประชุม 3 ชั่วโมง สรุปผลได้ใน 3 บรรทัด... นี่คืออาชญากรรมทางเวลา",
+    "slug": "effective-meeting-summary",
+    "excerpt": null,
+    "cover_image": "https://afmwjrjpgbskloerqjnb.supabase.co/storage/v1/object/public/blog-images/covers/1769968886792-rb1rfc6sirp.png",
+    "tags": [],
+    "read_time": 5,
+    "published_at": "2026-02-05T00:00:00.000Z",
+    "published": true,
+    "updated_at": "2026-02-05T00:00:00.000Z"
+  }
+]

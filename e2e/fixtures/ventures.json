@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1e6d3dff-bd29-4e44-a603-7f3bdf39f389",
+    "name": "JongQue.com",
+    "tagline": "SaaS for Resource & Queue Management",
+    "description": "A comprehensive platform for managing bookings, queues, and resources for businesses of all sizes.",
+    "url": "https://jongque.com",
+    "status": "Live",
+    "icon": "Rocket",
+    "display_order": 1,
+    "visible": true,
+    "created_at": "2026-02-01T19:11:09.344814+00:00",
+    "updated_at": "2026-02-01T19:11:09.344814+00:00",
+    "iconName": "Rocket",
+    "statusColor": "bg-green-500/10 text-green-400 border-green-500/30"
+  }
+]

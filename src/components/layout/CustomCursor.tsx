@@ -1,145 +1,118 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
-import { motion, useSpring, useTransform } from "framer-motion";
-import { useMousePosition } from "@/hooks/useMousePosition";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import { useMotionTier } from "@/motion/tier";
 
+const INTERACTIVE = 'a, button, [role="button"], select, [data-cursor]';
+const TEXT_INPUT = 'input, textarea, [contenteditable="true"]';
+
+/** Label shown in the cursor pill for data-cursor="…" values. */
+const LABELS: Record<string, string> = {
+  view: "View",
+  open: "Open",
+  drag: "Drag",
+  visit: "Visit",
+  talk: "Let's talk",
+  close: "Close",
+  top: "Top",
+  read: "Read",
+};
+
+/**
+ * Desktop-only cursor: a dot that follows exactly, plus a trailing ring that
+ * grows into a label pill over elements with data-cursor. Hidden on touch,
+ * in the lite/static tiers, and the native cursor is kept for text fields.
+ */
 export function CustomCursor() {
-  const { x, y } = useMousePosition();
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(true);
+  const tier = useMotionTier();
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const ringX = useSpring(x, { stiffness: 380, damping: 32, mass: 0.25 });
+  const ringY = useSpring(y, { stiffness: 380, damping: 32, mass: 0.25 });
+  const [state, setState] = useState<{ hover: boolean; label: string | null; text: boolean; visible: boolean }>({
+    hover: false,
+    label: null,
+    text: false,
+    visible: false,
+  });
 
-  // Use refs to avoid re-renders for hover state changes
-  const isHoveringRef = useRef(false);
-
-  // Fast spring for cursor dot - follows mouse almost instantly
-  const cursorX = useSpring(x, { stiffness: 1000, damping: 50, mass: 0.1 });
-  const cursorY = useSpring(y, { stiffness: 1000, damping: 50, mass: 0.1 });
-
-  // Slightly slower spring for ring - creates trailing effect
-  const ringX = useSpring(x, { stiffness: 400, damping: 35, mass: 0.2 });
-  const ringY = useSpring(y, { stiffness: 400, damping: 35, mass: 0.2 });
+  const enabled = tier === "full";
 
   useEffect(() => {
-    // Check if it's a touch device
-    setIsTouchDevice(
-      "ontouchstart" in window || navigator.maxTouchPoints > 0
-    );
-  }, []);
+    if (!enabled) return;
+    document.documentElement.classList.add("has-custom-cursor");
 
-  useEffect(() => {
-    const handleMouseEnter = () => setIsVisible(true);
-    const handleMouseLeave = () => setIsVisible(false);
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      x.set(e.clientX);
+      y.set(e.clientY);
+      const target = e.target as Element | null;
+      const text = !!target?.closest(TEXT_INPUT);
+      const hit = target?.closest(INTERACTIVE) as HTMLElement | null;
+      const key = hit?.dataset.cursor;
+      const label = key ? LABELS[key] ?? null : null;
+      setState((s) =>
+        s.hover === !!hit && s.label === label && s.text === text && s.visible
+          ? s
+          : { hover: !!hit, label, text, visible: true }
+      );
+    };
+    const onLeave = () => setState((s) => ({ ...s, visible: false }));
 
-    // Use passive listeners for better scroll performance
-    document.addEventListener("mouseenter", handleMouseEnter, { passive: true });
-    document.addEventListener("mouseleave", handleMouseLeave, { passive: true });
-
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onLeave);
     return () => {
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.documentElement.classList.remove("has-custom-cursor");
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
     };
-  }, []);
+  }, [enabled, x, y]);
 
-  // Memoized handlers to prevent recreating on each render
-  const handleHoverStart = useCallback(() => {
-    if (!isHoveringRef.current) {
-      isHoveringRef.current = true;
-      setIsHovering(true);
-    }
-  }, []);
+  if (!enabled) return null;
 
-  const handleHoverEnd = useCallback(() => {
-    if (isHoveringRef.current) {
-      isHoveringRef.current = false;
-      setIsHovering(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Use event delegation for better performance
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as Element;
-      if (target.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
-        handleHoverStart();
-      }
-    };
-
-    const handleMouseOut = (e: MouseEvent) => {
-      const target = e.target as Element;
-      const relatedTarget = e.relatedTarget as Element | null;
-      
-      if (target.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
-        // Check if we're not moving to another interactive element
-        if (!relatedTarget?.closest('a, button, [role="button"], input, textarea, select, [data-cursor-hover]')) {
-          handleHoverEnd();
-        }
-      }
-    };
-
-    document.addEventListener("mouseover", handleMouseOver, { passive: true });
-    document.addEventListener("mouseout", handleMouseOut, { passive: true });
-
-    return () => {
-      document.removeEventListener("mouseover", handleMouseOver);
-      document.removeEventListener("mouseout", handleMouseOut);
-    };
-  }, [handleHoverStart, handleHoverEnd]);
-
-  // Don't render on touch devices
-  if (isTouchDevice) return null;
+  const hideAll = !state.visible || state.text;
 
   return (
-    <>
-      {/* Add class to hide default cursor */}
-      <style jsx global>{`
-        @media (hover: hover) and (pointer: fine) {
-          * {
-            cursor: none !important;
-          }
-        }
-      `}</style>
-
-      {/* Cursor Dot - follows mouse instantly */}
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90]" data-testid="custom-cursor">
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference will-change-transform"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          scale: isHovering ? 0.5 : 1,
-          opacity: isVisible ? 1 : 0,
-        }}
-        transition={{ duration: 0.1 }}
-      >
-        <div className="w-3 h-3 bg-white rounded-full" />
-      </motion.div>
-
-      {/* Cursor Ring - trails behind slightly */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] will-change-transform"
-        style={{
-          x: ringX,
-          y: ringY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          scale: isHovering ? 1.5 : 1,
-          opacity: isVisible ? 1 : 0,
-        }}
+        className="fixed top-0 left-0 w-2 h-2 -ml-1 -mt-1 rounded-full bg-accent"
+        style={{ x, y }}
+        animate={{ opacity: hideAll ? 0 : 1, scale: state.hover ? 0 : 1 }}
         transition={{ duration: 0.15 }}
-      >
-        <div
-          className={`w-10 h-10 rounded-full border-2 transition-colors duration-150 ${
-            isHovering ? "border-accent" : "border-white/30"
-          }`}
-        />
+      />
+      <motion.div className="fixed top-0 left-0" style={{ x: ringX, y: ringY }}>
+        <motion.div
+          className="-translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full border overflow-hidden whitespace-nowrap"
+          animate={{
+            width: state.label ? 84 : state.hover ? 52 : 34,
+            height: state.label ? 84 : state.hover ? 52 : 34,
+            opacity: hideAll ? 0 : 1,
+            backgroundColor: state.label ? "rgba(255,90,31,0.95)" : "rgba(255,90,31,0)",
+            borderColor: state.hover ? "rgba(255,90,31,0.9)" : "rgba(237,230,217,0.35)",
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 26 }}
+        >
+          <AnimatePresence>
+            {state.label && (
+              <motion.span
+                key={state.label}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.6 }}
+                className="font-mono text-[11px] uppercase tracking-wider text-ink font-medium"
+              >
+                {state.label}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </motion.div>
-    </>
+      <style>{`
+        html.has-custom-cursor, html.has-custom-cursor a, html.has-custom-cursor button,
+        html.has-custom-cursor [role="button"], html.has-custom-cursor [data-cursor] { cursor: none; }
+        html.has-custom-cursor input, html.has-custom-cursor textarea, html.has-custom-cursor select { cursor: auto; }
+      `}</style>
+    </div>
   );
 }

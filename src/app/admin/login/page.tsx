@@ -16,47 +16,18 @@ export default function AdminLoginPage() {
 
   // Check if user is already authenticated on mount
   useEffect(() => {
-    console.log(
-      "[LOGIN PAGE] ========================================"
-    );
-    console.log("[LOGIN PAGE] useEffect running - checking auth");
-
     const checkAuth = async () => {
       try {
-        console.log(
-          "[LOGIN PAGE] Creating Supabase browser client..."
-        );
         const supabase = createSupabaseBrowserClient();
-        console.log("[LOGIN PAGE] Calling getUser()...");
         const {
           data: { user },
-          error,
         } = await supabase.auth.getUser();
-
-        console.log("[LOGIN PAGE] getUser() result:");
-        console.log(
-          "[LOGIN PAGE]   - user:",
-          user
-            ? `Found (id: ${user.id}, email: ${user.email})`
-            : "null"
-        );
-        console.log(
-          "[LOGIN PAGE]   - error:",
-          error ? error.message : "none"
-        );
 
         if (user) {
           // User is authenticated, redirect to admin dashboard
-          console.log(
-            "[LOGIN PAGE] User is authenticated - REDIRECTING to /admin"
-          );
           router.replace("/admin");
           return;
         }
-
-        console.log(
-          "[LOGIN PAGE] No user found - showing login form"
-        );
       } catch (error) {
         console.error("[LOGIN PAGE] Error checking auth:", error);
       }
@@ -71,45 +42,19 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError("");
 
-    console.log(
-      "[LOGIN PAGE] ========================================"
-    );
-    console.log(
-      "[LOGIN PAGE] Form submitted - attempting login with email:",
-      email
-    );
-
     try {
       const supabase = createSupabaseBrowserClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log("[LOGIN PAGE] signInWithPassword result:");
-      console.log(
-        "[LOGIN PAGE]   - user:",
-        data?.user ? `Found (id: ${data.user.id})` : "null"
-      );
-      console.log(
-        "[LOGIN PAGE]   - session:",
-        data?.session ? "exists" : "null"
-      );
-      console.log(
-        "[LOGIN PAGE]   - error:",
-        error ? error.message : "none"
-      );
-
       if (error) {
-        console.log("[LOGIN PAGE] Login failed:", error.message);
         setError(error.message);
         setIsLoading(false);
         return;
       }
 
-      console.log(
-        "[LOGIN PAGE] Login successful - navigating to /admin"
-      );
       router.push("/admin");
       router.refresh();
     } catch (err) {
@@ -127,9 +72,6 @@ export default function AdminLoginPage() {
 
   // Show loading state while checking auth
   if (isCheckingAuth) {
-    console.log(
-      "[LOGIN PAGE] Rendering: Loading state (checking auth)"
-    );
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4">
@@ -139,8 +81,6 @@ export default function AdminLoginPage() {
       </div>
     );
   }
-
-  console.log("[LOGIN PAGE] Rendering: Login form");
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -1,230 +1,151 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { cn, parseCategories } from "@/lib/utils";
 import { PortfolioCard } from "./PortfolioCard";
 import { PortfolioDetail } from "./PortfolioDetail";
+import { Dialog } from "@/components/ui/Dialog";
+import { useMotionTier } from "@/motion/tier";
 import type { PortfolioItem } from "@/lib/supabase-server";
 
 interface PortfolioShowcaseProps {
   portfolios: PortfolioItem[];
 }
 
-export function PortfolioShowcase({
-  portfolios,
-}: PortfolioShowcaseProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+/** Pinned horizontal gallery ("full" tier, ≥ lg); a responsive grid otherwise. */
+export function PortfolioShowcase({ portfolios }: PortfolioShowcaseProps) {
+  const tier = useMotionTier();
+  // Keep the last opened item while the drawer animates out (title must not blank).
+  const [drawer, setDrawer] = useState<{ id: string | null; open: boolean }>({ id: null, open: false });
+  const setSelectedId = (id: string | null) => setDrawer((d) => (id ? { id, open: true } : { ...d, open: false }));
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
-  // Extract unique categories (types) from portfolios, handling comma-separated values
-  const types = useMemo(() => {
-    const allTypes = portfolios.flatMap((p) =>
-      p.category
-        ? p.category
-            .split(", ")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : []
-    );
-    return [...new Set(allTypes)].sort();
-  }, [portfolios]);
+  const types = useMemo(
+    () => [...new Set(portfolios.flatMap((p) => parseCategories(p.category)))].sort(),
+    [portfolios]
+  );
+  const filtered = useMemo(
+    () =>
+      selectedTypes.length === 0
+        ? portfolios
+        : portfolios.filter((p) => parseCategories(p.category).some((t) => selectedTypes.includes(t))),
+    [portfolios, selectedTypes]
+  );
+  const selected = portfolios.find((p) => p.id === drawer.id) ?? null;
 
-  // Filter portfolios based on selected types (supports comma-separated categories)
-  const filteredPortfolios = useMemo(() => {
-    if (selectedTypes.length === 0) return portfolios;
-    return portfolios.filter((p) => {
-      const portfolioTypes = p.category
-        ? p.category
-            .split(", ")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : [];
-      return portfolioTypes.some((t) => selectedTypes.includes(t));
-    });
-  }, [portfolios, selectedTypes]);
+  const toggleType = (type: string) =>
+    setSelectedTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
 
-  const toggleType = (type: string) => {
-    setSelectedTypes((prev) =>
-      prev.includes(type)
-        ? prev.filter((t) => t !== type)
-        : [...prev, type]
-    );
-  };
-
-  const selectedPortfolio = selectedId
-    ? portfolios.find((p) => p.id === selectedId)
-    : null;
-
-  const handleCardClick = (id: string) => {
-    setSelectedId(id);
-    setIsDrawerOpen(true);
-  };
-
-  const handleCloseDrawer = useCallback(() => {
-    setIsDrawerOpen(false);
-    // Delay clearing the selected ID to allow exit animation
-    setTimeout(() => setSelectedId(null), 300);
-  }, []);
-
-  // Handle escape key to close drawer
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isDrawerOpen) {
-        handleCloseDrawer();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () =>
-      document.removeEventListener("keydown", handleEscape);
-  }, [isDrawerOpen, handleCloseDrawer]);
-
-  // Prevent body scroll when drawer is open
-  useEffect(() => {
-    if (isDrawerOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isDrawerOpen]);
-
-  if (portfolios.length === 0) {
-    return null;
-  }
+  if (portfolios.length === 0) return null;
 
   return (
     <>
-      {/* Type Filter - Multi Select */}
       {types.length > 1 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="flex flex-wrap items-center gap-2 mb-6"
-        >
-          <button
-            onClick={() => setSelectedTypes([])}
-            className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border",
-              selectedTypes.length === 0
-                ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
-                : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
-            )}
-          >
-            All
-          </button>
-          {types.map((type) => (
-            <button
-              key={type}
-              onClick={() => toggleType(type)}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border",
-                selectedTypes.includes(type)
-                  ? "bg-accent text-white border-accent shadow-sm shadow-accent/20"
-                  : "bg-card border-border text-muted hover:text-foreground hover:border-accent/50"
-              )}
-            >
-              {type}
-            </button>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-wrap items-center gap-2 mb-8" role="group" aria-label="Filter projects by type">
+          <FilterChip active={selectedTypes.length === 0} onClick={() => setSelectedTypes([])}>All</FilterChip>
+          {types.map((t) => (
+            <FilterChip key={t} active={selectedTypes.includes(t)} onClick={() => toggleType(t)}>{t}</FilterChip>
           ))}
-        </motion.div>
+        </div>
       )}
 
-      {/* Portfolio Cards Grid - Full Width */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          <AnimatePresence mode="popLayout">
-            {filteredPortfolios.map((portfolio, index) => (
-              <motion.div
-                key={portfolio.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <PortfolioCard
-                  portfolio={portfolio}
-                  isSelected={portfolio.id === selectedId}
-                  onClick={() => handleCardClick(portfolio.id)}
-                  index={index}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+      {filtered.length === 0 ? (
+        <p className="text-center text-muted py-12">No projects match the selected types.</p>
+      ) : tier === "full" && filtered.length > 2 ? (
+        <HorizontalGallery items={filtered} onOpen={setSelectedId} />
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map((p, i) => (
+            <PortfolioCard key={p.id} portfolio={p} index={i} total={filtered.length} onClick={() => setSelectedId(p.id)} />
+          ))}
         </div>
+      )}
 
-        {/* Empty state when no portfolios match filter */}
-        {filteredPortfolios.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted text-sm">
-              No projects found for the selected types.
-            </p>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Slide-in Drawer from Right */}
-      <AnimatePresence>
-        {isDrawerOpen && selectedPortfolio && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={handleCloseDrawer}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
-              aria-hidden="true"
-            />
-
-            {/* Drawer Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{
-                type: "spring",
-                damping: 30,
-                stiffness: 300,
-              }}
-              className="fixed top-0 right-0 h-full w-full sm:w-[90%] md:w-[70%] lg:w-[55%] xl:w-[45%] bg-card border-l border-border z-50 overflow-hidden flex flex-col"
-            >
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-10">
-                <h2 className="text-lg font-semibold text-foreground truncate pr-4">
-                  {selectedPortfolio.title}
-                </h2>
-                <button
-                  onClick={handleCloseDrawer}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border text-foreground hover:bg-accent/10 hover:border-accent/50 transition-[background-color,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-                  aria-label="Close drawer"
-                >
-                  <X size={20} aria-hidden="true" />
-                </button>
-              </div>
-
-              {/* Drawer Content - Scrollable */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <PortfolioDetail portfolio={selectedPortfolio} />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <Dialog
+        open={drawer.open && !!selected}
+        onClose={() => setSelectedId(null)}
+        variant="right"
+        title={selected?.title ?? ""}
+        testId="portfolio-drawer"
+      >
+        {selected && <PortfolioDetail portfolio={selected} />}
+      </Dialog>
     </>
+  );
+}
+
+function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+        active ? "bg-accent text-ink border-accent" : "bg-transparent border-border text-muted hover:text-foreground hover:border-accent/60"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function HorizontalGallery({ items, onOpen }: { items: PortfolioItem[]; onOpen: (id: string) => void }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [distance, setDistance] = useState(0);
+
+  // Pin length = how far the track must travel horizontally.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const measure = () => setDistance(Math.max(0, track.scrollWidth - window.innerWidth));
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [items.length]);
+
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end end"] });
+  const x = useTransform(scrollYProgress, [0, 1], [0, -distance]);
+  const bar = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  return (
+    <div ref={wrapRef} style={{ height: `calc(100svh + ${distance}px)` }} className="relative" data-testid="portfolio-gallery">
+      <div className="sticky top-0 h-svh flex flex-col justify-center overflow-hidden">
+        <motion.div ref={trackRef} style={{ x }} className="flex gap-6 pl-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pr-[10vw] will-change-transform">
+          {items.map((p, i) => (
+            <div
+              key={p.id}
+              className="shrink-0 w-[min(560px,42vw)]"
+              onFocus={(e) => {
+                // Keyboard users only: bring the focused card into the pinned viewport.
+                // (Mouse focus must not scroll, or the click lands on another element.)
+                if (!(e.target as HTMLElement).matches(":focus-visible")) return;
+                const wrap = wrapRef.current;
+                if (!wrap || distance === 0) return;
+                const ratio = i / Math.max(1, items.length - 1);
+                const top = wrap.getBoundingClientRect().top + window.scrollY + ratio * distance;
+                if (Math.abs(window.scrollY - top) > 40) window.scrollTo({ top });
+                e.stopPropagation();
+              }}
+            >
+              <PortfolioCard portfolio={p} index={i} total={items.length} progress={scrollYProgress} onClick={() => onOpen(p.id)} />
+            </div>
+          ))}
+        </motion.div>
+        <div className="max-w-7xl w-full mx-auto px-4 md:px-6 mt-10 flex items-center gap-4">
+          <span className="label-mono">Drag the page</span>
+          <div className="relative h-px flex-1 bg-border overflow-hidden">
+            <motion.div className="absolute inset-y-0 left-0 bg-accent" style={{ width: bar }} />
+          </div>
+          <span className="label-mono">{items.length} projects</span>
+        </div>
+      </div>
+    </div>
   );
 }

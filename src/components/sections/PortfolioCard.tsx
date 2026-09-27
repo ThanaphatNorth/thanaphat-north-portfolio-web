@@ -1,172 +1,86 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { motion, useTransform, type MotionValue } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { cn, parseCategories, stripMarkdown } from "@/lib/utils";
 import type { PortfolioItem } from "@/lib/supabase-server";
+import { WebGLHover } from "@/components/fx/WebGLHover";
+import { useMotionTier } from "@/motion/tier";
 
 interface PortfolioCardProps {
   portfolio: PortfolioItem;
-  isSelected: boolean;
   onClick: () => void;
   index: number;
+  total: number;
+  /** Horizontal-gallery progress; drives the inner-image parallax. */
+  progress?: MotionValue<number>;
+  className?: string;
 }
 
-export function PortfolioCard({
-  portfolio,
-  isSelected,
-  onClick,
-  index,
-}: PortfolioCardProps) {
+/** "Film frame" project card: image drifts inside its frame while the gallery moves. */
+export function PortfolioCard({ portfolio, onClick, index, total, progress, className }: PortfolioCardProps) {
+  const fallback = useTransform(() => 0);
+  const innerX = useTransform(progress ?? fallback, [0, 1], ["6%", "-6%"]);
+  const types = parseCategories(portfolio.category);
+  const tier = useMotionTier();
+  const [hovered, setHovered] = useState(false);
+  const cover = portfolio.cover_image;
+
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-      whileTap={{ scale: 0.98 }}
+    <button
+      type="button"
       onClick={onClick}
-      className="group relative text-left"
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      data-cursor="view"
+      data-testid="portfolio-card"
+      className={cn("group relative block w-full text-left rounded-2xl focus-visible:outline-none", className)}
     >
-      {/* Image Container */}
-      <div
-        className={cn(
-          "relative aspect-[4/3] rounded-2xl overflow-hidden transition-all duration-300",
-          "border-2 min-h-[180px] sm:min-h-[200px]",
-          isSelected
-            ? "border-accent ring-2 ring-accent/20 shadow-lg shadow-accent/10"
-            : "border-border group-hover:border-accent/50"
-        )}
-      >
-        {/* Background Image */}
-        <img
-          src={
-            portfolio.cover_image ||
-            "/images/portfolio-placeholder.svg"
-          }
-          alt={portfolio.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          style={{
-            objectPosition: `${
-              portfolio.cover_image_focal_x ?? 50
-            }% ${portfolio.cover_image_focal_y ?? 50}%`,
-          }}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "/images/portfolio-placeholder.svg";
-          }}
-        />
-
-        {/* Hover Overlay */}
-        <div
-          className={cn(
-            "absolute inset-0 bg-background/40 transition-opacity duration-300",
-            isSelected
-              ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100"
-          )}
-        />
-
-        {/* Content Inside Card - Shows on hover */}
-        <div
-          className={cn(
-            "absolute inset-x-0 bottom-0 p-3 translate-y-full transition-transform duration-300 ease-out",
-            isSelected ? "translate-y-0" : "group-hover:translate-y-0"
-          )}
-        >
-          <div className="bg-background/70 backdrop-blur-md rounded-xl p-3 border border-border/40">
-            {/* Type Badges */}
-            <div className="flex flex-wrap gap-1 mb-2">
-              {(portfolio.category || "")
-                .split(", ")
-                .filter(Boolean)
-                .map((type) => (
-                  <span
-                    key={type}
-                    className={cn(
-                      "inline-block px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
-                      isSelected
-                        ? "bg-accent text-white"
-                        : "bg-accent/20 text-accent"
-                    )}
-                  >
-                    {type.trim()}
-                  </span>
-                ))}
-            </div>
-
-            {/* Title */}
-            <h3
-              className={cn(
-                "text-base font-semibold line-clamp-2 transition-colors",
-                isSelected ? "text-accent" : "text-foreground"
-              )}
-            >
-              {portfolio.title}
-            </h3>
-
-            {/* Description Preview */}
-            <p className="text-xs text-muted line-clamp-2 mt-1">
-              {portfolio.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Selected Indicator */}
-        {isSelected && (
-          <motion.div
-            layoutId="selectedIndicator"
-            className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent"
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30,
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-ink-900 group-hover:border-accent/70 group-focus-visible:border-accent transition-colors">
+        <motion.div className="absolute inset-[-8%]" style={{ x: progress ? innerX : 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- CMS image of arbitrary host/size */}
+          <img
+            src={portfolio.cover_image || "/images/portfolio-placeholder.svg"}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+            style={{
+              objectPosition: `${portfolio.cover_image_focal_x ?? 50}% ${portfolio.cover_image_focal_y ?? 50}%`,
+            }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/images/portfolio-placeholder.svg";
             }}
           />
-        )}
-      </div>
-
-      {/* Content Below Card - Always visible, hides on hover */}
-      <div
-        className={cn(
-          "mt-3 transition-opacity duration-300",
-          isSelected ? "opacity-0" : "group-hover:opacity-0"
-        )}
-      >
-        {/* Type Badges */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {(portfolio.category || "")
-            .split(", ")
-            .filter(Boolean)
-            .map((type) => (
-              <span
-                key={type}
-                className={cn(
-                  "inline-block px-2.5 py-1 rounded-full text-xs font-medium",
-                  isSelected
-                    ? "bg-accent text-white"
-                    : "bg-accent/20 text-accent"
-                )}
-              >
-                {type.trim()}
+          {tier === "full" && cover && (
+            <WebGLHover
+              src={cover}
+              focalX={portfolio.cover_image_focal_x ?? 50}
+              focalY={portfolio.cover_image_focal_y ?? 50}
+              active={hovered}
+            />
+          )}
+        </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" aria-hidden="true" />
+        <span className="absolute top-4 left-4 label-mono !text-paper/80">
+          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </span>
+        <span className="absolute top-3 right-3 grid place-items-center w-10 h-10 rounded-full bg-ink/60 border border-border text-foreground opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all" aria-hidden="true">
+          <ArrowUpRight size={18} />
+        </span>
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {types.map((t) => (
+              <span key={t} className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-accent/15 text-accent border border-accent/30">
+                {t}
               </span>
             ))}
+          </div>
+          <h3 className="font-display text-xl md:text-2xl font-semibold text-paper leading-tight">{portfolio.title}</h3>
+          <p className="mt-1 text-sm text-paper/70 line-clamp-2">{stripMarkdown(portfolio.description)}</p>
         </div>
-
-        {/* Title */}
-        <h3
-          className={cn(
-            "text-base font-semibold line-clamp-2",
-            isSelected ? "text-accent" : "text-foreground"
-          )}
-        >
-          {portfolio.title}
-        </h3>
-
-        {/* Description Preview */}
-        <p className="text-xs text-muted line-clamp-2 mt-1">
-          {portfolio.description}
-        </p>
       </div>
-    </motion.button>
+    </button>
   );
 }

@@ -206,6 +206,7 @@ export function ImageUpload({ value, onChange, bucket = "blog-images" }: ImageUp
       {value && (
         <div className="relative">
           <div className="relative bg-card border border-border rounded-lg overflow-hidden p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
             <img
               src={value}
               alt="Cover preview"

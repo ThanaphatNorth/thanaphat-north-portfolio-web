@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { cache } from "react";
@@ -85,6 +86,7 @@ export const getExperienceYears = cache(
 
       return getDefaultExperienceYears();
     } catch (err) {
+      unstable_rethrow(err); // let Next handle its own dynamic-render signals
       console.warn("Error fetching experience settings:", err);
       return getDefaultExperienceYears();
     }
@@ -129,6 +131,7 @@ export const getVentures = cache(async (): Promise<VentureItem[]> => {
     // If no data in database, use default ventures
     return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
   } catch (error) {
+    unstable_rethrow(error); // let Next handle its own dynamic-render signals
     console.error("Error fetching ventures:", error);
     return defaultVentures.map((v) => ({ ...v, icon: "Rocket" }));
   }
@@ -187,6 +190,7 @@ export const getPortfolios = cache(
 
       return data || [];
     } catch (error) {
+      unstable_rethrow(error); // let Next handle its own dynamic-render signals
       console.error("Error fetching portfolios:", error);
       return [];
     }

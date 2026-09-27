@@ -151,6 +151,7 @@ export function BlogSearch({ posts }: BlogSearchProps) {
                     <article className="bg-card border border-border rounded-2xl overflow-hidden hover:border-accent/50 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5">
                       {post.cover_image && (
                         <div className="bg-background overflow-hidden flex items-center justify-center p-4">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- CMS/upload URL of arbitrary host & size */}
                           <img
                             src={post.cover_image}
                             alt={post.title}

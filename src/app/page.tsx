@@ -11,7 +11,17 @@ import { Ventures } from "@/components/sections/Ventures";
 import { Philosophy } from "@/components/sections/Philosophy";
 import { TechStack } from "@/components/sections/TechStack";
 import { LatestBlog } from "@/components/sections/LatestBlog";
-import { getExperienceYears } from "@/lib/supabase-server";
+import { Summit } from "@/components/sections/Summit";
+import { CompassProgress } from "@/components/fx/CompassProgress";
+import { MotionProvider } from "@/motion/MotionProvider";
+import { ContactProvider } from "@/components/contact/ContactProvider";
+import {
+  getExperienceYears,
+  getPortfolios,
+  getVentures,
+} from "@/lib/supabase-server";
+import { TerminalProvider } from "@/components/terminal/TerminalProvider";
+import { Intro } from "@/components/fx/Intro";
 
 // Loading skeleton for portfolio section
 function PortfolioSkeleton() {
@@ -117,32 +127,55 @@ function BlogSkeleton() {
 
 export default async function Home() {
   // Fetch experience years server-side - no client-side waterfall
-  const experience = await getExperienceYears();
+  const [experience, portfolios, ventures] = await Promise.all([
+    getExperienceYears(),
+    getPortfolios(),
+    getVentures(),
+  ]);
+  // Plain data for the terminal (React.cache dedupes these with the sections' own fetches).
+  const terminalData = {
+    experience,
+    projects: portfolios.map((p) => ({ title: p.title, category: p.category })),
+    ventures: ventures.map((v) => ({
+      name: v.name,
+      tagline: v.tagline,
+      url: v.url,
+      status: v.status,
+    })),
+  };
 
   return (
-    <>
-      <CustomCursor />
-      <Navigation />
-      <main>
-        <Hero experience={experience} />
-        <ImpactDashboard />
-        <ExperienceTimeline />
-        {/* Portfolio section with split layout */}
-        <Suspense fallback={<PortfolioSkeleton />}>
-          <Portfolio />
-        </Suspense>
-        <FreelanceServices />
-        {/* Suspense enables streaming - shell renders immediately, data streams in */}
-        <Suspense fallback={<VenturesSkeleton />}>
-          <Ventures />
-        </Suspense>
-        <Suspense fallback={<BlogSkeleton />}>
-          <LatestBlog />
-        </Suspense>
-        <Philosophy />
-        <TechStack />
-      </main>
-      <Footer />
-    </>
+    <MotionProvider>
+      <ContactProvider>
+        <TerminalProvider data={terminalData}>
+          <div className="grain">
+            <Intro />
+            <CustomCursor />
+            <Navigation />
+            <CompassProgress />
+            <main id="main">
+              <Hero experience={experience} />
+              <ImpactDashboard />
+              <Suspense fallback={<PortfolioSkeleton />}>
+                <Portfolio />
+              </Suspense>
+              <ExperienceTimeline />
+              <FreelanceServices />
+              {/* Suspense enables streaming - shell renders immediately, data streams in */}
+              <Suspense fallback={<VenturesSkeleton />}>
+                <Ventures />
+              </Suspense>
+              <Philosophy />
+              <Suspense fallback={<BlogSkeleton />}>
+                <LatestBlog />
+              </Suspense>
+              <TechStack />
+              <Summit />
+            </main>
+            <Footer />
+          </div>
+        </TerminalProvider>
+      </ContactProvider>
+    </MotionProvider>
   );
 }

@@ -62,7 +62,9 @@ export default function AdminDashboard() {
   }, [supabase, filter]);
 
   useEffect(() => {
-    fetchContacts();
+    (async () => {
+      await fetchContacts();
+    })();
   }, [fetchContacts]);
 
   const handleToggleRead = async (contact: Contact) => {
