@@ -69,7 +69,9 @@ export default function AdminPortfolioPage() {
   }, [supabase, filter]);
 
   useEffect(() => {
-    fetchPortfolios();
+    (async () => {
+      await fetchPortfolios();
+    })();
   }, [fetchPortfolios]);
 
   const handleToggleVisible = async (portfolio: Portfolio) => {
@@ -212,6 +214,7 @@ export default function AdminPortfolioPage() {
                   {/* Thumbnail */}
                   <div className="hidden sm:block flex-shrink-0">
                     {portfolio.cover_image ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- admin preview of an arbitrary user-supplied image URL, not a Next-optimizable static asset
                       <img
                         src={portfolio.cover_image}
                         alt={portfolio.title}

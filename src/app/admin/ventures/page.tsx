@@ -56,7 +56,9 @@ export default function AdminVenturesPage() {
   }, [supabase, filter]);
 
   useEffect(() => {
-    fetchVentures();
+    (async () => {
+      await fetchVentures();
+    })();
   }, [fetchVentures]);
 
   const handleToggleVisible = async (venture: Venture) => {

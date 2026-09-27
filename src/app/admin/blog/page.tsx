@@ -53,7 +53,9 @@ export default function AdminBlogPage() {
   }, [supabase, filter]);
 
   useEffect(() => {
-    fetchPosts();
+    (async () => {
+      await fetchPosts();
+    })();
   }, [fetchPosts]);
 
   const handleTogglePublished = async (post: BlogPost) => {
